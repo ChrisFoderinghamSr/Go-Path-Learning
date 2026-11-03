@@ -12,3 +12,25 @@ Visitor records contain dates only, counted once per browser cookie interval. A 
 
 An existing browser-only learning backup can be imported by its owner after login. Imported checklist progress never grants instructor approval. To change course requirements, update units.json along with curriculum.js and review how existing students will meet new requirements.
 
+
+## Launch from AWS CloudShell in Ohio
+
+Use the repository's deploy/launch.sh from a clean checkout of the reviewed release commit. The script builds an immutable image in ECR, deploys the CloudFormation stack in us-east-2 and tests HTTPS using the load balancer before DNS cutover.
+
+Account prerequisites:
+
+- Create the course OAuth app in GitHub with homepage https://www.go.chrisfoderingham.com and callback https://www.go.chrisfoderingham.com/student/callback. Save GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET as two JSON keys in an Ohio Secrets Manager secret named go-path/github-oauth. Use the default Secrets Manager encryption key with this template. Keep the values out of GitHub and chat.
+- Request and DNS-validate an ACM certificate covering www.go.chrisfoderingham.com in us-east-2. Set CERTIFICATE_ARN to the issued certificate ARN.
+- Set REVIEWER_GITHUB_IDS to the appointed instructors' numeric GitHub IDs. Students cannot approve their own work. The repository owner's ID is 307307124 if the owner is an appointed instructor.
+- Use a default VPC with two default public subnets or explicitly set VPC_ID, SUBNET_A and SUBNET_B to internet-routed subnets in separate availability zones with VPC DNS enabled.
+- The deployment creates billable Fargate, ALB, EFS, ECR and CloudWatch resources. The ECS task role for infrastructure execution reads only the selected OAuth secret in addition to the standard ECS execution policy. Updating the single-writer task briefly interrupts service.
+
+Run in an authenticated CloudShell from the repository root:
+
+```bash
+export CERTIFICATE_ARN='YOUR_ISSUED_ACM_CERTIFICATE_ARN'
+export REVIEWER_GITHUB_IDS='YOUR_APPOINTED_REVIEWER_ID'
+bash deploy/launch.sh
+```
+
+The script prints the load balancer DNS name after checking /healthz and confirming anonymous requests to /student/state receive 401. Create a Route 53 A alias for www.go pointing to that load balancer, then complete the real student and independent instructor test above. Existing go.chrisfoderingham.com can continue serving the Amplify edition during the transition. To roll back a service revision, check out a previous tested release and rerun the script with the same stack and volume. Retain the encrypted EFS filesystem and verify a backup restore separately.

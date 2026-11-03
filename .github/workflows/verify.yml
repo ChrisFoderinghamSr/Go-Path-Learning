@@ -20,6 +20,10 @@ jobs:
           node-version: '22'
       - name: Check course routes, backups and certificate catalog
         run: node check.mjs
+      - name: Validate the AWS launch configuration
+        run: |
+          bash -n deploy/launch.sh
+          pipx run --spec cfn-lint cfn-lint --regions us-east-2 --non-zero-exit-code error --template deploy/aws.yml
       - name: Check Go service and review permissions
         run: |
           go test ./...
