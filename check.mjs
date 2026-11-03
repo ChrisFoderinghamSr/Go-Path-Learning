@@ -8,8 +8,8 @@ const context=vm.createContext({window:{scrollTo(){},addEventListener(){}},locat
 vm.runInContext(fs.readFileSync('dist/curriculum.js','utf8'),context);
 vm.runInContext(fs.readFileSync('dist/app.js','utf8'),context);
 const modules=context.window.CURRICULUM;
-assert.equal(modules.length,10);
-assert.equal(modules.flatMap(m=>m.lessons).length,30);
+assert.equal(modules.length,12);
+assert.equal(modules.flatMap(m=>m.lessons).length,40);
 const ids=new Set();
 for(const m of modules){assert(m.project.rubric.length>=3);assert(m.project.requirements.length>=3);for(const l of m.lessons){assert(!ids.has(l.id));ids.add(l.id);assert(l.sections.length>=3,`${l.id} needs depth`);assert(l.code.length>40);assert(l.exercise.length>40);assert(l.solution.length>20);assert(l.quiz.options.length>=3);assert(Number.isInteger(l.quiz.answer));assert(l.quiz.answer>=0&&l.quiz.answer<l.quiz.options.length);assert(l.sources.length>0);for(const s of l.sources)assert(new URL(s.url).protocol==='https:')}}
 assert(element('main').innerHTML.includes('Big ideas. Small, runnable steps.'),'root route must show home');

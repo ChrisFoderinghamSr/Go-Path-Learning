@@ -180,6 +180,66 @@
     "answer": -1
   },
   {
+    "id": "body-limits",
+    "title": "Bound a request body",
+    "answer": 1
+  },
+  {
+    "id": "unknown-fields",
+    "title": "Reject unknown JSON fields",
+    "answer": 1
+  },
+  {
+    "id": "etag",
+    "title": "Detect stale edits",
+    "answer": 1
+  },
+  {
+    "id": "stable-order",
+    "title": "Paginate with a stable sort",
+    "answer": 1
+  },
+  {
+    "id": "retry-create",
+    "title": "Make a retried create safe",
+    "answer": 1
+  },
+  {
+    "id": "project-contract-lab",
+    "title": "Ship a resilient task endpoint",
+    "answer": -1
+  },
+  {
+    "id": "config-check",
+    "title": "Validate release configuration",
+    "answer": 1
+  },
+  {
+    "id": "readiness",
+    "title": "Separate readiness from liveness",
+    "answer": 1
+  },
+  {
+    "id": "drain",
+    "title": "Drain in-flight requests",
+    "answer": 1
+  },
+  {
+    "id": "restore-drill",
+    "title": "Prove a backup can be restored",
+    "answer": 1
+  },
+  {
+    "id": "release-evidence",
+    "title": "Assemble release evidence",
+    "answer": 1
+  },
+  {
+    "id": "project-release-lab",
+    "title": "Rehearse a recoverable release",
+    "answer": -1
+  },
+  {
     "id": "deployment",
     "title": "Build, configure, and shut down cleanly",
     "answer": 1

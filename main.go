@@ -33,6 +33,12 @@ func handler() http.Handler {
 }
 
 func main() {
+	if len(os.Args) == 2 && os.Args[1] == "--sample-certificate" {
+		if err := sampleCredential(os.Stdout); err != nil {
+			log.Fatal(err)
+		}
+		return
+	}
 	addr := os.Getenv("GO_PATH_ADDR")
 	if addr == "" {
 		addr = "127.0.0.1:8080"

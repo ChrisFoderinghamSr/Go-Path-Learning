@@ -1,6 +1,6 @@
 FROM golang:1.26-alpine AS build
 WORKDIR /src
-COPY go.mod *.go units.json ./
+COPY go.mod *.go units.json certificate.html ./
 COPY dist/ dist/
 RUN CGO_ENABLED=0 go test ./... && CGO_ENABLED=0 go build -trimpath -o /go-path .
 RUN mkdir /data && chown 65532:65532 /data && apk add --no-cache ca-certificates

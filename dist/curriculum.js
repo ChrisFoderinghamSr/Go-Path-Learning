@@ -808,4 +808,524 @@ govulncheck ./...`, 'Complete a self-review using the capstone rubric below. Rec
 [ ] Design tradeoffs and remaining limitations are explicit.`,['Every criterion has linked evidence','No hard-coded production secrets or demo-only authentication remain','A second person can run and assess the app','You can explain one rejected design alternative and why'], 'Which is the strongest evidence that ownership is enforced?', ['The UI hides other users’ tasks','Two-user API tests attempt every read and write using another user’s ID','Task IDs are difficult to guess'],1,'Authorization must hold at the server boundary even when clients bypass the UI or know a resource ID.',[src('Go documentation hub','https://go.dev/doc/'),src('Database documentation','https://go.dev/doc/database/'),src('Security best practices','https://go.dev/doc/security/best-practices')])
   ],project:project('Capstone: Taskboard, from source to service','Deliver an operable multi-user task board with a Go API, PostgreSQL persistence, same-origin frontend, and a documented security and deployment story. Allocate several days beyond the reading time to build and revise it.',['All task CRUD persists across restart','Authenticated owner-scoped access with CSRF defenses','Accessible frontend and complete failure states','Domain, HTTP, database, and two-user end-to-end tests','Versioned migrations, vulnerability review, graceful shutdown','Clean-checkout README, threat model, API contract, and restore-tested runbook'],['Functionality and persistence (25%)','Security and isolation (25%)','Testing and failure recovery (20%)','Frontend accessibility and clarity (15%)','Operability and explanation of tradeoffs (15%)'])}
   ];
+  window.CURRICULUM.splice(window.CURRICULUM.length-1,0,...[
+  {
+    "id": "contract-lab",
+    "title": "API contract lab",
+    "subtitle": "Exercise the boundaries of a task API",
+    "level": "Full stack",
+    "lessons": [
+      {
+        "id": "body-limits",
+        "title": "Bound a request body",
+        "minutes": 40,
+        "objectives": [
+          "Send valid JSON padded beyond 4096 bytes. Return 413 for MaxBytesError and 400 for malformed JSON within the limit."
+        ],
+        "sections": [
+          {
+            "title": "The problem",
+            "body": "A client can stream more bytes than the server intended to read. Enforce the byte limit before decoding JSON so the decoder cannot consume an unlimited stream."
+          },
+          {
+            "title": "Implement the change",
+            "body": "Send valid JSON padded beyond 4096 bytes. Return 413 for MaxBytesError and 400 for malformed JSON within the limit."
+          },
+          {
+            "title": "Verify the boundary",
+            "body": "Test exactly 4096 bytes and one byte more, with a valid JSON value in both requests."
+          }
+        ],
+        "code": "r.Body = http.MaxBytesReader(w, r.Body, 4096)\ndefer r.Body.Close()",
+        "exercise": "Send valid JSON padded beyond 4096 bytes. Return 413 for MaxBytesError and 400 for malformed JSON within the limit.",
+        "hint": "Test exactly 4096 bytes and one byte more, with a valid JSON value in both requests.",
+        "solution": "Test exactly 4096 bytes and one byte more, with a valid JSON value in both requests.",
+        "checks": [
+          "Demonstrate the expected success case",
+          "Test exactly 4096 bytes and one byte more, with a valid JSON value in both requests.",
+          "Commit the implementation and its verification evidence"
+        ],
+        "quiz": {
+          "question": "Which layer limits the bytes consumed?",
+          "options": [
+            "The database column",
+            "The reader wrapping the request body",
+            "The HTML input length"
+          ],
+          "answer": 1,
+          "explanation": "A client can stream more bytes than the server intended to read. Enforce the byte limit before decoding JSON so the decoder cannot consume an unlimited stream."
+        },
+        "sources": [
+          {
+            "title": "net/http reference",
+            "url": "https://pkg.go.dev/net/http"
+          }
+        ]
+      },
+      {
+        "id": "unknown-fields",
+        "title": "Reject unknown JSON fields",
+        "minutes": 40,
+        "objectives": [
+          "Add a test for a misspelled field and another for a second JSON object after the first."
+        ],
+        "sections": [
+          {
+            "title": "The problem",
+            "body": "A misspelled field such as titlle can silently become an empty title. A strict decoder makes the contract observable at the HTTP boundary."
+          },
+          {
+            "title": "Implement the change",
+            "body": "Add a test for a misspelled field and another for a second JSON object after the first."
+          },
+          {
+            "title": "Verify the boundary",
+            "body": "Decode the first object, then attempt a second decode and require io.EOF."
+          }
+        ],
+        "code": "dec := json.NewDecoder(r.Body)\ndec.DisallowUnknownFields()\nerr := dec.Decode(&input)",
+        "exercise": "Add a test for a misspelled field and another for a second JSON object after the first.",
+        "hint": "Decode the first object, then attempt a second decode and require io.EOF.",
+        "solution": "Decode the first object, then attempt a second decode and require io.EOF.",
+        "checks": [
+          "Demonstrate the expected success case",
+          "Decode the first object, then attempt a second decode and require io.EOF.",
+          "Commit the implementation and its verification evidence"
+        ],
+        "quiz": {
+          "question": "Which input needs an extra decode to detect?",
+          "options": [
+            "An unknown key in the first object",
+            "Two adjacent JSON objects",
+            "An empty body"
+          ],
+          "answer": 1,
+          "explanation": "A misspelled field such as titlle can silently become an empty title. A strict decoder makes the contract observable at the HTTP boundary."
+        },
+        "sources": [
+          {
+            "title": "encoding/json reference",
+            "url": "https://pkg.go.dev/encoding/json"
+          }
+        ]
+      },
+      {
+        "id": "etag",
+        "title": "Detect stale edits",
+        "minutes": 40,
+        "objectives": [
+          "Simulate two edits from version 1. Accept one and reject the stale one without changing the stored title."
+        ],
+        "sections": [
+          {
+            "title": "The problem",
+            "body": "Two browser tabs can edit the same task. Include a version in the update condition so a stale tab cannot overwrite a newer edit."
+          },
+          {
+            "title": "Implement the change",
+            "body": "Simulate two edits from version 1. Accept one and reject the stale one without changing the stored title."
+          },
+          {
+            "title": "Verify the boundary",
+            "body": "Check RowsAffected. A zero count must never be reported as a successful update."
+          }
+        ],
+        "code": "UPDATE tasks SET title=$1, version=version+1\nWHERE id=$2 AND owner_id=$3 AND version=$4",
+        "exercise": "Simulate two edits from version 1. Accept one and reject the stale one without changing the stored title.",
+        "hint": "Check RowsAffected. A zero count must never be reported as a successful update.",
+        "solution": "Check RowsAffected. A zero count must never be reported as a successful update.",
+        "checks": [
+          "Demonstrate the expected success case",
+          "Check RowsAffected. A zero count must never be reported as a successful update.",
+          "Commit the implementation and its verification evidence"
+        ],
+        "quiz": {
+          "question": "What makes the conflict check atomic?",
+          "options": [
+            "Reading it before UPDATE",
+            "Matching the version in the UPDATE",
+            "Checking in JavaScript"
+          ],
+          "answer": 1,
+          "explanation": "Two browser tabs can edit the same task. Include a version in the update condition so a stale tab cannot overwrite a newer edit."
+        },
+        "sources": [
+          {
+            "title": "database/sql reference",
+            "url": "https://pkg.go.dev/database/sql"
+          }
+        ]
+      },
+      {
+        "id": "stable-order",
+        "title": "Paginate with a stable sort",
+        "minutes": 40,
+        "objectives": [
+          "Seed three tasks with the same timestamp. Fetch pages of two and prove each ID appears exactly once."
+        ],
+        "sections": [
+          {
+            "title": "The problem",
+            "body": "Two tasks may share a creation time. Include a unique tie breaker so the next page can resume precisely after the last row."
+          },
+          {
+            "title": "Implement the change",
+            "body": "Seed three tasks with the same timestamp. Fetch pages of two and prove each ID appears exactly once."
+          },
+          {
+            "title": "Verify the boundary",
+            "body": "Use the final row’s timestamp and ID together as the next cursor."
+          }
+        ],
+        "code": "SELECT id, title FROM tasks WHERE owner_id=$1\nAND (created_at,id) < ($2,$3)\nORDER BY created_at DESC,id DESC LIMIT $4",
+        "exercise": "Seed three tasks with the same timestamp. Fetch pages of two and prove each ID appears exactly once.",
+        "hint": "Use the final row’s timestamp and ID together as the next cursor.",
+        "solution": "Use the final row’s timestamp and ID together as the next cursor.",
+        "checks": [
+          "Demonstrate the expected success case",
+          "Use the final row’s timestamp and ID together as the next cursor.",
+          "Commit the implementation and its verification evidence"
+        ],
+        "quiz": {
+          "question": "Why include the ID in the cursor?",
+          "options": [
+            "It authenticates users",
+            "It orders rows whose timestamps are equal",
+            "It replaces owner filtering"
+          ],
+          "answer": 1,
+          "explanation": "Two tasks may share a creation time. Include a unique tie breaker so the next page can resume precisely after the last row."
+        },
+        "sources": [
+          {
+            "title": "database/sql reference",
+            "url": "https://pkg.go.dev/database/sql"
+          }
+        ]
+      },
+      {
+        "id": "retry-create",
+        "title": "Make a retried create safe",
+        "minutes": 40,
+        "objectives": [
+          "Send two requests with one key. Return the original result for the same payload and reject reuse for a different payload."
+        ],
+        "sections": [
+          {
+            "title": "The problem",
+            "body": "If the response is lost after commit, the browser may retry. A unique request key scoped to the owner lets the server identify the original operation."
+          },
+          {
+            "title": "Implement the change",
+            "body": "Send two requests with one key. Return the original result for the same payload and reject reuse for a different payload."
+          },
+          {
+            "title": "Verify the boundary",
+            "body": "Store the request key, payload fingerprint and task ID in the same transaction as task creation."
+          }
+        ],
+        "code": "CREATE UNIQUE INDEX request_per_owner\nON task_requests(owner_id, request_key);",
+        "exercise": "Send two requests with one key. Return the original result for the same payload and reject reuse for a different payload.",
+        "hint": "Store the request key, payload fingerprint and task ID in the same transaction as task creation.",
+        "solution": "Store the request key, payload fingerprint and task ID in the same transaction as task creation.",
+        "checks": [
+          "Demonstrate the expected success case",
+          "Store the request key, payload fingerprint and task ID in the same transaction as task creation.",
+          "Commit the implementation and its verification evidence"
+        ],
+        "quiz": {
+          "question": "What should two matching retries create?",
+          "options": [
+            "Two tasks",
+            "One task",
+            "No task"
+          ],
+          "answer": 1,
+          "explanation": "If the response is lost after commit, the browser may retry. A unique request key scoped to the owner lets the server identify the original operation."
+        },
+        "sources": [
+          {
+            "title": "database/sql reference",
+            "url": "https://pkg.go.dev/database/sql"
+          }
+        ]
+      }
+    ],
+    "project": {
+      "title": "Ship a resilient task endpoint",
+      "brief": "Demonstrate safe concurrent edits, bounded inputs, deterministic pages and replay-safe creates.",
+      "requirements": [
+        "Send valid JSON padded beyond 4096 bytes. Return 413 for MaxBytesError and 400 for malformed JSON within the limit.",
+        "Add a test for a misspelled field and another for a second JSON object after the first.",
+        "Simulate two edits from version 1. Accept one and reject the stale one without changing the stored title.",
+        "Seed three tasks with the same timestamp. Fetch pages of two and prove each ID appears exactly once.",
+        "Send two requests with one key. Return the original result for the same payload and reject reuse for a different payload."
+      ],
+      "rubric": [
+        "Boundary requests return documented status codes",
+        "Concurrent and repeated writes preserve data",
+        "Pagination tests cover timestamps that tie"
+      ]
+    }
+  },
+  {
+    "id": "release-lab",
+    "title": "Release rehearsal",
+    "subtitle": "Prove the service is ready to ship",
+    "level": "Full stack",
+    "lessons": [
+      {
+        "id": "config-check",
+        "title": "Validate release configuration",
+        "minutes": 40,
+        "objectives": [
+          "Write a configuration loader and test missing, blank and valid database settings. Keep connection strings out of logs."
+        ],
+        "sections": [
+          {
+            "title": "The problem",
+            "body": "Go services should fail early when a required setting is missing. Treat a present but empty value as invalid when the application needs a usable address."
+          },
+          {
+            "title": "Implement the change",
+            "body": "Write a configuration loader and test missing, blank and valid database settings. Keep connection strings out of logs."
+          },
+          {
+            "title": "Verify the boundary",
+            "body": "Use t.Setenv for valid and blank cases; inject a lookup function for the missing-key case."
+          }
+        ],
+        "code": "dsn, ok := os.LookupEnv(\"DATABASE_URL\")\nif !ok || strings.TrimSpace(dsn)==\"\" { return errors.New(\"DATABASE_URL required\") }",
+        "exercise": "Write a configuration loader and test missing, blank and valid database settings. Keep connection strings out of logs.",
+        "hint": "Use t.Setenv for valid and blank cases; inject a lookup function for the missing-key case.",
+        "solution": "Use t.Setenv for valid and blank cases; inject a lookup function for the missing-key case.",
+        "checks": [
+          "Demonstrate the expected success case",
+          "Use t.Setenv for valid and blank cases; inject a lookup function for the missing-key case.",
+          "Commit the implementation and its verification evidence"
+        ],
+        "quiz": {
+          "question": "What should an error log contain?",
+          "options": [
+            "The full DSN",
+            "The missing setting name",
+            "The password"
+          ],
+          "answer": 1,
+          "explanation": "Go services should fail early when a required setting is missing. Treat a present but empty value as invalid when the application needs a usable address."
+        },
+        "sources": [
+          {
+            "title": "os reference",
+            "url": "https://pkg.go.dev/os"
+          }
+        ]
+      },
+      {
+        "id": "readiness",
+        "title": "Separate readiness from liveness",
+        "minutes": 40,
+        "objectives": [
+          "Implement separate live and ready routes. Simulate a database outage and verify only readiness returns 503."
+        ],
+        "sections": [
+          {
+            "title": "The problem",
+            "body": "A running process can be healthy while its database is unreachable. A readiness probe can temporarily remove it from traffic without restarting it."
+          },
+          {
+            "title": "Implement the change",
+            "body": "Implement separate live and ready routes. Simulate a database outage and verify only readiness returns 503."
+          },
+          {
+            "title": "Verify the boundary",
+            "body": "Inject a ping function and test success, error and deadline cases without a live database."
+          }
+        ],
+        "code": "ctx, cancel := context.WithTimeout(r.Context(), time.Second)\ndefer cancel()\nerr := db.PingContext(ctx)",
+        "exercise": "Implement separate live and ready routes. Simulate a database outage and verify only readiness returns 503.",
+        "hint": "Inject a ping function and test success, error and deadline cases without a live database.",
+        "solution": "Inject a ping function and test success, error and deadline cases without a live database.",
+        "checks": [
+          "Demonstrate the expected success case",
+          "Inject a ping function and test success, error and deadline cases without a live database.",
+          "Commit the implementation and its verification evidence"
+        ],
+        "quiz": {
+          "question": "Which check should fail during a temporary database outage?",
+          "options": [
+            "Both checks always",
+            "Readiness",
+            "Liveness only"
+          ],
+          "answer": 1,
+          "explanation": "A running process can be healthy while its database is unreachable. A readiness probe can temporarily remove it from traffic without restarting it."
+        },
+        "sources": [
+          {
+            "title": "context reference",
+            "url": "https://pkg.go.dev/context"
+          }
+        ]
+      },
+      {
+        "id": "drain",
+        "title": "Drain in-flight requests",
+        "minutes": 40,
+        "objectives": [
+          "Start a handler that waits on a channel. Initiate shutdown, release the handler, and verify its response completes."
+        ],
+        "sections": [
+          {
+            "title": "The problem",
+            "body": "A release can interrupt valid writes. Stop accepting new requests, then allow active handlers a bounded interval to finish."
+          },
+          {
+            "title": "Implement the change",
+            "body": "Start a handler that waits on a channel. Initiate shutdown, release the handler, and verify its response completes."
+          },
+          {
+            "title": "Verify the boundary",
+            "body": "Use a channel to establish that the handler started before invoking Shutdown."
+          }
+        ],
+        "code": "ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)\ndefer cancel()\nerr := srv.Shutdown(ctx)",
+        "exercise": "Start a handler that waits on a channel. Initiate shutdown, release the handler, and verify its response completes.",
+        "hint": "Use a channel to establish that the handler started before invoking Shutdown.",
+        "solution": "Use a channel to establish that the handler started before invoking Shutdown.",
+        "checks": [
+          "Demonstrate the expected success case",
+          "Use a channel to establish that the handler started before invoking Shutdown.",
+          "Commit the implementation and its verification evidence"
+        ],
+        "quiz": {
+          "question": "What should the shutdown deadline bound?",
+          "options": [
+            "Every database query forever",
+            "Time allowed for active requests to finish",
+            "Browser cache lifetime"
+          ],
+          "answer": 1,
+          "explanation": "A release can interrupt valid writes. Stop accepting new requests, then allow active handlers a bounded interval to finish."
+        },
+        "sources": [
+          {
+            "title": "net/http reference",
+            "url": "https://pkg.go.dev/net/http"
+          }
+        ]
+      },
+      {
+        "id": "restore-drill",
+        "title": "Prove a backup can be restored",
+        "minutes": 40,
+        "objectives": [
+          "Use a disposable fixture database and fresh restore target. Confirm one owner can retrieve their task and cannot retrieve another user’s task."
+        ],
+        "sections": [
+          {
+            "title": "The problem",
+            "body": "A backup file only helps if the team can recover its contents. Restore into an isolated database and check ownership as well as task counts."
+          },
+          {
+            "title": "Implement the change",
+            "body": "Use a disposable fixture database and fresh restore target. Confirm one owner can retrieve their task and cannot retrieve another user’s task."
+          },
+          {
+            "title": "Verify the boundary",
+            "body": "Compare fixture IDs, titles, owners and counts. Record the exact commands and recovery time."
+          }
+        ],
+        "code": "pg_dump --format=custom --file=tasks.dump taskboard\npg_restore --exit-on-error --no-owner --dbname=taskboard_drill tasks.dump",
+        "exercise": "Use a disposable fixture database and fresh restore target. Confirm one owner can retrieve their task and cannot retrieve another user’s task.",
+        "hint": "Compare fixture IDs, titles, owners and counts. Record the exact commands and recovery time.",
+        "solution": "Compare fixture IDs, titles, owners and counts. Record the exact commands and recovery time.",
+        "checks": [
+          "Demonstrate the expected success case",
+          "Compare fixture IDs, titles, owners and counts. Record the exact commands and recovery time.",
+          "Commit the implementation and its verification evidence"
+        ],
+        "quiz": {
+          "question": "What proves a backup is usable?",
+          "options": [
+            "A nonempty filename",
+            "A tested restore and data checks",
+            "A successful upload alone"
+          ],
+          "answer": 1,
+          "explanation": "A backup file only helps if the team can recover its contents. Restore into an isolated database and check ownership as well as task counts."
+        },
+        "sources": [
+          {
+            "title": "database/sql reference",
+            "url": "https://pkg.go.dev/database/sql"
+          }
+        ]
+      },
+      {
+        "id": "release-evidence",
+        "title": "Assemble release evidence",
+        "minutes": 40,
+        "objectives": [
+          "Prepare a release note that a classmate can follow on a clean checkout. Include one expected failure and a rollback procedure."
+        ],
+        "sections": [
+          {
+            "title": "The problem",
+            "body": "A reviewer needs a reproducible trail from a Git revision to a tested application. Record the revision, configuration names, test results and smoke-test procedure together."
+          },
+          {
+            "title": "Implement the change",
+            "body": "Prepare a release note that a classmate can follow on a clean checkout. Include one expected failure and a rollback procedure."
+          },
+          {
+            "title": "Verify the boundary",
+            "body": "Have the reviewer reproduce the tests against the pinned commit and record a dated result."
+          }
+        ],
+        "code": "git rev-parse HEAD\ngo test ./...\ngo vet ./...\ngo build -trimpath -o taskboard .",
+        "exercise": "Prepare a release note that a classmate can follow on a clean checkout. Include one expected failure and a rollback procedure.",
+        "hint": "Have the reviewer reproduce the tests against the pinned commit and record a dated result.",
+        "solution": "Have the reviewer reproduce the tests against the pinned commit and record a dated result.",
+        "checks": [
+          "Demonstrate the expected success case",
+          "Have the reviewer reproduce the tests against the pinned commit and record a dated result.",
+          "Commit the implementation and its verification evidence"
+        ],
+        "quiz": {
+          "question": "Which identifier pins exactly the reviewed code?",
+          "options": [
+            "The main branch name",
+            "The full commit SHA",
+            "A local folder name"
+          ],
+          "answer": 1,
+          "explanation": "A reviewer needs a reproducible trail from a Git revision to a tested application. Record the revision, configuration names, test results and smoke-test procedure together."
+        },
+        "sources": [
+          {
+            "title": "testing reference",
+            "url": "https://pkg.go.dev/testing"
+          }
+        ]
+      }
+    ],
+    "project": {
+      "title": "Rehearse a recoverable release",
+      "brief": "Release the task board into a disposable environment, interrupt it, and recover its data.",
+      "requirements": [
+        "Write a configuration loader and test missing, blank and valid database settings. Keep connection strings out of logs.",
+        "Implement separate live and ready routes. Simulate a database outage and verify only readiness returns 503.",
+        "Start a handler that waits on a channel. Initiate shutdown, release the handler, and verify its response completes.",
+        "Use a disposable fixture database and fresh restore target. Confirm one owner can retrieve their task and cannot retrieve another user’s task.",
+        "Prepare a release note that a classmate can follow on a clean checkout. Include one expected failure and a rollback procedure."
+      ],
+      "rubric": [
+        "A fresh checkout starts from documented settings",
+        "The readiness, drain and restore drills are reproducible",
+        "The release note identifies the verified commit"
+      ]
+    }
+  }
+]);
 })();

@@ -19,11 +19,11 @@ go vet ./...
 
 ## What works
 
-- Ten progressive modules and thirty detailed lessons with original explanations, code examples, exercises, hints, worked solutions and sources.
+- Twelve progressive modules and forty detailed lessons with original explanations, code examples, exercises, hints, worked solutions and sources.
 - Search and filter lessons; navigate modules, checkpoints and project briefs.
 - Interactive quizzes with explanatory feedback and retry support.
 - Lesson completion requires a correct answer and a learner-reviewed exercise checklist.
-- Ten projects with requirements and saved self-assessment rubrics.
+- Twelve projects with requirements and saved self-assessment rubrics.
 - Saved code drafts, personal notes, completion and quiz answers on the current device.
 - JSON export/import for backups and moving progress between devices. Import validates its schema and asks before replacement.
 - Go examples and drafts can be downloaded, then run locally or pasted into the official Go Playground.

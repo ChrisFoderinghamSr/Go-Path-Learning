@@ -35,13 +35,15 @@ type session struct {
 }
 type submission struct{ SHA, Status, Reviewer, Comment string }
 type record struct {
-	Repo        int64
-	Progress    json.RawMessage
-	Version     int
-	Work        map[string]submission
-	Certificate string
-	Published   string
-	Login       string
+	Repo                      int64
+	Progress                  json.RawMessage
+	Version                   int
+	Work                      map[string]submission
+	Issued                    string
+	LessonCount, ProjectCount int
+	Certificate               string
+	Published                 string
+	Login                     string
 }
 type school struct {
 	mu          sync.Mutex
@@ -293,9 +295,7 @@ func (s *school) actions(w http.ResponseWriter, q *http.Request, ss session, r r
 		x.Comment = q.FormValue("comment")
 		x.Reviewer = ss.Login
 		target.Work[item] = x
-		if s.eligible(target) && target.Certificate == "" {
-			target.Certificate = nonce()
-		}
+		s.issue(&target)
 		if s.store(id, target) != nil {
 			die(w, 500, "Could not save review.")
 			return
@@ -374,9 +374,7 @@ func (s *school) actions(w http.ResponseWriter, q *http.Request, ss session, r r
 			return
 		}
 	}
-	if s.eligible(r) && r.Certificate == "" {
-		r.Certificate = nonce()
-	}
+	s.issue(&r)
 	if s.store(ss.ID, r) != nil {
 		die(w, 500, "Could not save student record.")
 		return
@@ -466,6 +464,11 @@ func academy(next http.Handler) http.Handler {
 	}
 	return http.HandlerFunc(func(w http.ResponseWriter, q *http.Request) {
 		p := q.URL.Path
+		if p == "/certificate/sample" && q.Method == "GET" {
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			_ = sampleCredential(w)
+			return
+		}
 		if p == "/healthz" || p == "/style.css" {
 			next.ServeHTTP(w, q)
 			return
@@ -488,7 +491,12 @@ func academy(next http.Handler) http.Handler {
 				id, e := strconv.ParseInt(v[0], 10, 64)
 				r, err := s.load(id)
 				if e == nil && err == nil && r.Certificate != "" && r.Certificate == v[1] {
-					page(w, "Certificate of completion", fmt.Sprintf("<p>Go Path · Beginner to Full Stack</p><p>GitHub account ID %d completed all %d instructor-verified coursework items.</p><p>Credential ID: %s</p>", id, len(s.units), r.Certificate))
+					if r.Issued == "" {
+						page(w, "Certificate of Completion", fmt.Sprintf("<p>Legacy credential for GitHub account ID %d. Credential ID: %s</p>", id, r.Certificate))
+						return
+					}
+					w.Header().Set("Content-Type", "text/html; charset=utf-8")
+					_ = renderCredential(w, credentialView{Name: r.Login, ShortName: r.Login, Login: r.Login, Issued: r.Issued, Credential: r.Certificate, Lessons: r.LessonCount, Projects: r.ProjectCount, Link: s.origin + p})
 					return
 				}
 			}
