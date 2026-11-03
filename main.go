@@ -33,11 +33,17 @@ func handler() http.Handler {
 }
 
 func main() {
+	if len(os.Args) == 2 && os.Args[1] == "--sample-certificate" {
+		if err := sampleCredential(os.Stdout); err != nil {
+			log.Fatal(err)
+		}
+		return
+	}
 	addr := os.Getenv("GO_PATH_ADDR")
 	if addr == "" {
 		addr = "127.0.0.1:8080"
 	}
-	server := &http.Server{Addr: addr, Handler: handler(), ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 15 * time.Second, WriteTimeout: 15 * time.Second, IdleTimeout: 60 * time.Second}
+	server := &http.Server{Addr: addr, Handler: academy(handler()), ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 15 * time.Second, WriteTimeout: 15 * time.Second, IdleTimeout: 60 * time.Second}
 	log.Printf("Go Path listening on %s", addr)
 	log.Fatal(server.ListenAndServe())
 }

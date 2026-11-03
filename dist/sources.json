@@ -11,11 +11,12 @@
     "note": "The index inventory is searchable in the Reference Explorer. Experimental, internal and version-specific entries are references, not recommendations to use them in application code."
   },
   "curriculum": {
-    "modules": 10,
-    "lessons": 30,
+    "modules": 12,
+    "lessons": 40,
     "learningStack": "Go standard library + PostgreSQL + same-origin semantic HTML/CSS/JavaScript. A maintained PostgreSQL driver is an explicit external dependency.",
-    "appStack": "HTML, CSS and JavaScript; progress stored locally with export/import. No remote Go execution or automated code grader is claimed.",
-    "minimumFeatures": "Generic examples need Go 1.18+; method-aware ServeMux examples need Go 1.22+. Install a currently supported stable Go release and consult version notes."
+    "appStack": "HTML, CSS and JavaScript; GitHub sign-in, private backend records and public milestone summaries with export/import. No remote Go execution or automated code grader is claimed.",
+    "minimumFeatures": "Generic examples need Go 1.18+; method-aware ServeMux examples need Go 1.22+. Install a currently supported stable Go release and consult version notes.",
+    "projects": 12
   },
   "crossChecks": [
     {
@@ -533,6 +534,118 @@
             {
               "title": "govulncheck",
               "url": "https://go.dev/doc/security/vuln/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "module": "contract-lab",
+      "title": "API contract lab",
+      "lessons": [
+        {
+          "id": "body-limits",
+          "title": "Bound a request body",
+          "sources": [
+            {
+              "title": "net/http reference",
+              "url": "https://pkg.go.dev/net/http"
+            }
+          ]
+        },
+        {
+          "id": "unknown-fields",
+          "title": "Reject unknown JSON fields",
+          "sources": [
+            {
+              "title": "encoding/json reference",
+              "url": "https://pkg.go.dev/encoding/json"
+            }
+          ]
+        },
+        {
+          "id": "etag",
+          "title": "Detect stale edits",
+          "sources": [
+            {
+              "title": "database/sql reference",
+              "url": "https://pkg.go.dev/database/sql"
+            }
+          ]
+        },
+        {
+          "id": "stable-order",
+          "title": "Paginate with a stable sort",
+          "sources": [
+            {
+              "title": "database/sql reference",
+              "url": "https://pkg.go.dev/database/sql"
+            }
+          ]
+        },
+        {
+          "id": "retry-create",
+          "title": "Make a retried create safe",
+          "sources": [
+            {
+              "title": "database/sql reference",
+              "url": "https://pkg.go.dev/database/sql"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "module": "release-lab",
+      "title": "Release rehearsal",
+      "lessons": [
+        {
+          "id": "config-check",
+          "title": "Validate release configuration",
+          "sources": [
+            {
+              "title": "os reference",
+              "url": "https://pkg.go.dev/os"
+            }
+          ]
+        },
+        {
+          "id": "readiness",
+          "title": "Separate readiness from liveness",
+          "sources": [
+            {
+              "title": "context reference",
+              "url": "https://pkg.go.dev/context"
+            }
+          ]
+        },
+        {
+          "id": "drain",
+          "title": "Drain in-flight requests",
+          "sources": [
+            {
+              "title": "net/http reference",
+              "url": "https://pkg.go.dev/net/http"
+            }
+          ]
+        },
+        {
+          "id": "restore-drill",
+          "title": "Prove a backup can be restored",
+          "sources": [
+            {
+              "title": "database/sql reference",
+              "url": "https://pkg.go.dev/database/sql"
+            }
+          ]
+        },
+        {
+          "id": "release-evidence",
+          "title": "Assemble release evidence",
+          "sources": [
+            {
+              "title": "testing reference",
+              "url": "https://pkg.go.dev/testing"
             }
           ]
         }

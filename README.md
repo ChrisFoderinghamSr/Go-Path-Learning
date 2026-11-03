@@ -10,7 +10,7 @@ Install a supported Go release (1.22 or newer is the syntax baseline), open this
 go run .
 ```
 
-Open http://127.0.0.1:8080. Stop the server with Ctrl+C. No dependencies or database are required for the learning platform. You can alternatively serve `dist/` with any static web server. Use the same address each time to retain browser-local progress. Device storage is scoped by browser and site address.
+Open http://127.0.0.1:8080 to view the enrollment screen, or visit /certificate/sample for the printable example. Student sign-in requires HTTPS, a registered GitHub OAuth app and persistent backend storage. Follow [the student deployment guide](STUDENT-DEPLOYMENT.md) before enrolling real students.
 
 ```
 go test ./...
@@ -19,12 +19,12 @@ go vet ./...
 
 ## What works
 
-- Ten progressive modules and thirty detailed lessons with original explanations, code examples, exercises, hints, worked solutions and sources.
+- Twelve progressive modules and forty detailed lessons with original explanations, code examples, exercises, hints, worked solutions and sources.
 - Search and filter lessons; navigate modules, checkpoints and project briefs.
 - Interactive quizzes with explanatory feedback and retry support.
 - Lesson completion requires a correct answer and a learner-reviewed exercise checklist.
-- Ten projects with requirements and saved self-assessment rubrics.
-- Saved code drafts, personal notes, completion and quiz answers on the current device.
+- Twelve projects with requirements and saved self-assessment rubrics.
+- Saved code drafts, personal notes, completion and quiz answers in the signed-in student’s private backend record.
 - JSON export/import for backups and moving progress between devices. Import validates its schema and asks before replacement.
 - Go examples and drafts can be downloaded, then run locally or pasted into the official Go Playground.
 - Responsive layout, keyboard controls, labeled form fields, live feedback and a skip link.
@@ -32,9 +32,9 @@ go vet ./...
 
 ## Scope and architecture
 
-The learning UI is HTML/CSS/JavaScript. The local server is Go `net/http`; the hosted edition serves the same static assets. Learning records use `localStorage`, with no login, server database or cross-device sync. The curriculum teaches Go `net/http`, PostgreSQL through `database/sql`, HTML templates and browser fetch, testing, authentication design, security and deployment. Those integrations are course material and project work, not hidden services operated by this app.
+The Go server serves the course and student API from one HTTPS origin. Students sign in with GitHub and enroll a public Go-Path-Student repository they own. Private records hold drafts, notes and quiz answers. GitHub receives a separate summary of milestones and reviewed commit SHAs. A single running service writes to persistent storage.
 
-The editor does not execute untrusted code, and review checklists do not automatically grade submissions. Checkpoint questions are graded in the browser. A passed checkpoint is evidence of a knowledge check, not a professional certification. No credentials or private data are sent to a code runner.
+Coursework runs locally or in Go Playground. An instructor reviews each pinned submission. An issued certificate requires 40 completed lesson checkpoints and independent approval of all 40 lessons and 12 projects. The public verification page displays the award details recorded at issuance.
 
 Fonts load from Google Fonts when online; the interface falls back to system fonts. Official references and the Go Playground require an internet connection. Course content is bundled locally.
 

@@ -1,0 +1,262 @@
+[
+  {
+    "id": "hello",
+    "title": "Set up and say hello",
+    "answer": 0
+  },
+  {
+    "id": "values",
+    "title": "Values, variables, and zero values",
+    "answer": 1
+  },
+  {
+    "id": "control",
+    "title": "Decisions, loops, and readable flow",
+    "answer": 1
+  },
+  {
+    "id": "project-foundations",
+    "title": "Build a command-line receipt",
+    "answer": -1
+  },
+  {
+    "id": "functions",
+    "title": "Functions with useful contracts",
+    "answer": 1
+  },
+  {
+    "id": "collections",
+    "title": "Slices and maps without surprises",
+    "answer": 1
+  },
+  {
+    "id": "text",
+    "title": "Text, parsing, and useful validation",
+    "answer": 1
+  },
+  {
+    "id": "project-data",
+    "title": "Build a word-frequency tool",
+    "answer": -1
+  },
+  {
+    "id": "structs",
+    "title": "Structs, methods, and pointers",
+    "answer": 1
+  },
+  {
+    "id": "errors",
+    "title": "Errors and small interfaces",
+    "answer": 1
+  },
+  {
+    "id": "generics",
+    "title": "Generics when the algorithm stays the same",
+    "answer": 1
+  },
+  {
+    "id": "project-types",
+    "title": "Design an in-memory task library",
+    "answer": -1
+  },
+  {
+    "id": "modules",
+    "title": "Packages and dependency hygiene",
+    "answer": 1
+  },
+  {
+    "id": "streams",
+    "title": "Files, readers, and resource ownership",
+    "answer": 1
+  },
+  {
+    "id": "json",
+    "title": "JSON as an explicit data contract",
+    "answer": 1
+  },
+  {
+    "id": "project-packages",
+    "title": "Save a task list to JSON",
+    "answer": -1
+  },
+  {
+    "id": "unit-tests",
+    "title": "Table-driven tests that catch mistakes",
+    "answer": 1
+  },
+  {
+    "id": "http-tests",
+    "title": "Test behavior at an HTTP boundary",
+    "answer": 1
+  },
+  {
+    "id": "fuzzing",
+    "title": "Fuzz invariants and measure before optimizing",
+    "answer": 1
+  },
+  {
+    "id": "project-testing",
+    "title": "Give your task library a safety net",
+    "answer": -1
+  },
+  {
+    "id": "goroutines",
+    "title": "Goroutines and channels",
+    "answer": 1
+  },
+  {
+    "id": "sync",
+    "title": "Shared state and bounded workers",
+    "answer": 1
+  },
+  {
+    "id": "context",
+    "title": "Cancellation and deadlines",
+    "answer": 1
+  },
+  {
+    "id": "project-concurrency",
+    "title": "Build a bounded concurrent checker",
+    "answer": -1
+  },
+  {
+    "id": "routing",
+    "title": "HTTP handlers and routes",
+    "answer": 1
+  },
+  {
+    "id": "requests",
+    "title": "Validate JSON at the edge",
+    "answer": 1
+  },
+  {
+    "id": "middleware",
+    "title": "Middleware and a stable API contract",
+    "answer": 1
+  },
+  {
+    "id": "project-http",
+    "title": "Ship a tested task API",
+    "answer": -1
+  },
+  {
+    "id": "schema",
+    "title": "Model data and connect safely",
+    "answer": 1
+  },
+  {
+    "id": "queries",
+    "title": "Queries, ownership, and SQL injection",
+    "answer": 1
+  },
+  {
+    "id": "transactions",
+    "title": "Transactions and consistent updates",
+    "answer": 1
+  },
+  {
+    "id": "project-database",
+    "title": "Replace memory with PostgreSQL",
+    "answer": -1
+  },
+  {
+    "id": "frontend",
+    "title": "A frontend that understands the API",
+    "answer": 1
+  },
+  {
+    "id": "sessions",
+    "title": "Identity, sessions, and authorization",
+    "answer": 1
+  },
+  {
+    "id": "security",
+    "title": "Security as everyday engineering",
+    "answer": 1
+  },
+  {
+    "id": "project-fullstack",
+    "title": "Build the complete task-board experience",
+    "answer": -1
+  },
+  {
+    "id": "body-limits",
+    "title": "Bound a request body",
+    "answer": 1
+  },
+  {
+    "id": "unknown-fields",
+    "title": "Reject unknown JSON fields",
+    "answer": 1
+  },
+  {
+    "id": "etag",
+    "title": "Detect stale edits",
+    "answer": 1
+  },
+  {
+    "id": "stable-order",
+    "title": "Paginate with a stable sort",
+    "answer": 1
+  },
+  {
+    "id": "retry-create",
+    "title": "Make a retried create safe",
+    "answer": 1
+  },
+  {
+    "id": "project-contract-lab",
+    "title": "Ship a resilient task endpoint",
+    "answer": -1
+  },
+  {
+    "id": "config-check",
+    "title": "Validate release configuration",
+    "answer": 1
+  },
+  {
+    "id": "readiness",
+    "title": "Separate readiness from liveness",
+    "answer": 1
+  },
+  {
+    "id": "drain",
+    "title": "Drain in-flight requests",
+    "answer": 1
+  },
+  {
+    "id": "restore-drill",
+    "title": "Prove a backup can be restored",
+    "answer": 1
+  },
+  {
+    "id": "release-evidence",
+    "title": "Assemble release evidence",
+    "answer": 1
+  },
+  {
+    "id": "project-release-lab",
+    "title": "Rehearse a recoverable release",
+    "answer": -1
+  },
+  {
+    "id": "deployment",
+    "title": "Build, configure, and shut down cleanly",
+    "answer": 1
+  },
+  {
+    "id": "operations",
+    "title": "Observe, diagnose, and improve",
+    "answer": 1
+  },
+  {
+    "id": "capstone",
+    "title": "Capstone: a trustworthy full-stack task board",
+    "answer": 1
+  },
+  {
+    "id": "project-production",
+    "title": "Capstone: Taskboard, from source to service",
+    "answer": -1
+  }
+]

@@ -1,0 +1,45 @@
+name: Verify Go Path
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.x'
+          cache: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check course routes, backups and certificate catalog
+        run: node check.mjs
+      - name: Build the public Amplify catalog
+        run: node build-amplify.mjs
+      - name: Validate the AWS launch configuration
+        run: |
+          bash -n deploy/launch.sh
+          pipx run --spec cfn-lint cfn-lint --regions us-east-2 --non-zero-exit-code error --template deploy/aws.yml
+      - name: Check Go service and review permissions
+        run: |
+          go test ./...
+          go vet ./...
+      - name: Check generated course guides
+        run: |
+          node export-course.mjs
+          git diff --exit-code -- CURRICULUM.md dist/course-guide.md
+      - name: Build and smoke-test the student container
+        run: |
+          docker build -t go-path:check .
+          docker run -d --name go-path -p 127.0.0.1:8080:8080 go-path:check
+          trap 'docker logs go-path; docker rm -f go-path' EXIT
+          curl --retry 8 --retry-connrefused --fail --silent http://127.0.0.1:8080/healthz
+          curl --fail --silent http://127.0.0.1:8080/certificate/sample -o /tmp/sample.html
+          grep -q SAMPLE-GP-0042 /tmp/sample.html
+          test "$(curl --silent -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/student/state)" = 401

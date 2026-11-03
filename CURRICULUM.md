@@ -2,7 +2,7 @@
 
 A self-paced curriculum. Read, experiment, test, and build. Guided reading estimates exclude independent project work.
 
-Recommended order: Your first Go program → Work with real data → Design with types → Build useful Go programs → Make correctness visible → Concurrency with a clear lifetime → Build a Go web API → Add durable storage → Connect the whole experience → From a project to a service.
+Recommended order: Your first Go program → Work with real data → Design with types → Build useful Go programs → Make correctness visible → Concurrency with a clear lifetime → Build a Go web API → Add durable storage → Connect the whole experience → API contract lab → Release rehearsal → From a project to a service.
 
 Complete each exercise, pass its checkpoint, and review the module project before moving on. Revisit earlier modules whenever a concept feels uncertain.
 
@@ -2441,11 +2441,655 @@ Self-review rubric:
 - [ ] Identity and security controls (40%)
 - [ ] Accessibility and failure recovery (25%)
 
-# 10. From a project to a service
+# 10. API contract lab
+
+Exercise the boundaries of a task API
+
+Level: Full stack. Prerequisite: Connect the whole experience.
+
+## Bound a request body
+
+40 minutes of guided study, plus practice.
+
+Learning objectives:
+
+- Send valid JSON padded beyond 4096 bytes. Return 413 for MaxBytesError and 400 for malformed JSON within the limit.
+
+### The problem
+
+A client can stream more bytes than the server intended to read. Enforce the byte limit before decoding JSON so the decoder cannot consume an unlimited stream.
+
+### Implement the change
+
+Send valid JSON padded beyond 4096 bytes. Return 413 for MaxBytesError and 400 for malformed JSON within the limit.
+
+### Verify the boundary
+
+Test exactly 4096 bytes and one byte more, with a valid JSON value in both requests.
+
+### Example
+
+```
+r.Body = http.MaxBytesReader(w, r.Body, 4096)
+defer r.Body.Close()
+```
+
+### Exercise
+
+Send valid JSON padded beyond 4096 bytes. Return 413 for MaxBytesError and 400 for malformed JSON within the limit.
+
+Hint: Test exactly 4096 bytes and one byte more, with a valid JSON value in both requests.
+
+Review criteria:
+
+- [ ] Demonstrate the expected success case
+- [ ] Test exactly 4096 bytes and one byte more, with a valid JSON value in both requests.
+- [ ] Commit the implementation and its verification evidence
+
+### Worked solution
+
+```
+Test exactly 4096 bytes and one byte more, with a valid JSON value in both requests.
+```
+
+### Checkpoint
+
+Which layer limits the bytes consumed?
+
+1. The database column
+2. The reader wrapping the request body
+3. The HTML input length
+
+Answer: 2. A client can stream more bytes than the server intended to read. Enforce the byte limit before decoding JSON so the decoder cannot consume an unlimited stream.
+
+Sources:
+
+- [net/http reference](https://pkg.go.dev/net/http)
+
+## Reject unknown JSON fields
+
+40 minutes of guided study, plus practice.
+
+Learning objectives:
+
+- Add a test for a misspelled field and another for a second JSON object after the first.
+
+### The problem
+
+A misspelled field such as titlle can silently become an empty title. A strict decoder makes the contract observable at the HTTP boundary.
+
+### Implement the change
+
+Add a test for a misspelled field and another for a second JSON object after the first.
+
+### Verify the boundary
+
+Decode the first object, then attempt a second decode and require io.EOF.
+
+### Example
+
+```
+dec := json.NewDecoder(r.Body)
+dec.DisallowUnknownFields()
+err := dec.Decode(&input)
+```
+
+### Exercise
+
+Add a test for a misspelled field and another for a second JSON object after the first.
+
+Hint: Decode the first object, then attempt a second decode and require io.EOF.
+
+Review criteria:
+
+- [ ] Demonstrate the expected success case
+- [ ] Decode the first object, then attempt a second decode and require io.EOF.
+- [ ] Commit the implementation and its verification evidence
+
+### Worked solution
+
+```
+Decode the first object, then attempt a second decode and require io.EOF.
+```
+
+### Checkpoint
+
+Which input needs an extra decode to detect?
+
+1. An unknown key in the first object
+2. Two adjacent JSON objects
+3. An empty body
+
+Answer: 2. A misspelled field such as titlle can silently become an empty title. A strict decoder makes the contract observable at the HTTP boundary.
+
+Sources:
+
+- [encoding/json reference](https://pkg.go.dev/encoding/json)
+
+## Detect stale edits
+
+40 minutes of guided study, plus practice.
+
+Learning objectives:
+
+- Simulate two edits from version 1. Accept one and reject the stale one without changing the stored title.
+
+### The problem
+
+Two browser tabs can edit the same task. Include a version in the update condition so a stale tab cannot overwrite a newer edit.
+
+### Implement the change
+
+Simulate two edits from version 1. Accept one and reject the stale one without changing the stored title.
+
+### Verify the boundary
+
+Check RowsAffected. A zero count must never be reported as a successful update.
+
+### Example
+
+```
+UPDATE tasks SET title=$1, version=version+1
+WHERE id=$2 AND owner_id=$3 AND version=$4
+```
+
+### Exercise
+
+Simulate two edits from version 1. Accept one and reject the stale one without changing the stored title.
+
+Hint: Check RowsAffected. A zero count must never be reported as a successful update.
+
+Review criteria:
+
+- [ ] Demonstrate the expected success case
+- [ ] Check RowsAffected. A zero count must never be reported as a successful update.
+- [ ] Commit the implementation and its verification evidence
+
+### Worked solution
+
+```
+Check RowsAffected. A zero count must never be reported as a successful update.
+```
+
+### Checkpoint
+
+What makes the conflict check atomic?
+
+1. Reading it before UPDATE
+2. Matching the version in the UPDATE
+3. Checking in JavaScript
+
+Answer: 2. Two browser tabs can edit the same task. Include a version in the update condition so a stale tab cannot overwrite a newer edit.
+
+Sources:
+
+- [database/sql reference](https://pkg.go.dev/database/sql)
+
+## Paginate with a stable sort
+
+40 minutes of guided study, plus practice.
+
+Learning objectives:
+
+- Seed three tasks with the same timestamp. Fetch pages of two and prove each ID appears exactly once.
+
+### The problem
+
+Two tasks may share a creation time. Include a unique tie breaker so the next page can resume precisely after the last row.
+
+### Implement the change
+
+Seed three tasks with the same timestamp. Fetch pages of two and prove each ID appears exactly once.
+
+### Verify the boundary
+
+Use the final row’s timestamp and ID together as the next cursor.
+
+### Example
+
+```
+SELECT id, title FROM tasks WHERE owner_id=$1
+AND (created_at,id) < ($2,$3)
+ORDER BY created_at DESC,id DESC LIMIT $4
+```
+
+### Exercise
+
+Seed three tasks with the same timestamp. Fetch pages of two and prove each ID appears exactly once.
+
+Hint: Use the final row’s timestamp and ID together as the next cursor.
+
+Review criteria:
+
+- [ ] Demonstrate the expected success case
+- [ ] Use the final row’s timestamp and ID together as the next cursor.
+- [ ] Commit the implementation and its verification evidence
+
+### Worked solution
+
+```
+Use the final row’s timestamp and ID together as the next cursor.
+```
+
+### Checkpoint
+
+Why include the ID in the cursor?
+
+1. It authenticates users
+2. It orders rows whose timestamps are equal
+3. It replaces owner filtering
+
+Answer: 2. Two tasks may share a creation time. Include a unique tie breaker so the next page can resume precisely after the last row.
+
+Sources:
+
+- [database/sql reference](https://pkg.go.dev/database/sql)
+
+## Make a retried create safe
+
+40 minutes of guided study, plus practice.
+
+Learning objectives:
+
+- Send two requests with one key. Return the original result for the same payload and reject reuse for a different payload.
+
+### The problem
+
+If the response is lost after commit, the browser may retry. A unique request key scoped to the owner lets the server identify the original operation.
+
+### Implement the change
+
+Send two requests with one key. Return the original result for the same payload and reject reuse for a different payload.
+
+### Verify the boundary
+
+Store the request key, payload fingerprint and task ID in the same transaction as task creation.
+
+### Example
+
+```
+CREATE UNIQUE INDEX request_per_owner
+ON task_requests(owner_id, request_key);
+```
+
+### Exercise
+
+Send two requests with one key. Return the original result for the same payload and reject reuse for a different payload.
+
+Hint: Store the request key, payload fingerprint and task ID in the same transaction as task creation.
+
+Review criteria:
+
+- [ ] Demonstrate the expected success case
+- [ ] Store the request key, payload fingerprint and task ID in the same transaction as task creation.
+- [ ] Commit the implementation and its verification evidence
+
+### Worked solution
+
+```
+Store the request key, payload fingerprint and task ID in the same transaction as task creation.
+```
+
+### Checkpoint
+
+What should two matching retries create?
+
+1. Two tasks
+2. One task
+3. No task
+
+Answer: 2. If the response is lost after commit, the browser may retry. A unique request key scoped to the owner lets the server identify the original operation.
+
+Sources:
+
+- [database/sql reference](https://pkg.go.dev/database/sql)
+
+## Project: Ship a resilient task endpoint
+
+Demonstrate safe concurrent edits, bounded inputs, deterministic pages and replay-safe creates.
+
+Requirements:
+
+- Send valid JSON padded beyond 4096 bytes. Return 413 for MaxBytesError and 400 for malformed JSON within the limit.
+- Add a test for a misspelled field and another for a second JSON object after the first.
+- Simulate two edits from version 1. Accept one and reject the stale one without changing the stored title.
+- Seed three tasks with the same timestamp. Fetch pages of two and prove each ID appears exactly once.
+- Send two requests with one key. Return the original result for the same payload and reject reuse for a different payload.
+
+Self-review rubric:
+
+- [ ] Boundary requests return documented status codes
+- [ ] Concurrent and repeated writes preserve data
+- [ ] Pagination tests cover timestamps that tie
+
+# 11. Release rehearsal
+
+Prove the service is ready to ship
+
+Level: Full stack. Prerequisite: API contract lab.
+
+## Validate release configuration
+
+40 minutes of guided study, plus practice.
+
+Learning objectives:
+
+- Write a configuration loader and test missing, blank and valid database settings. Keep connection strings out of logs.
+
+### The problem
+
+Go services should fail early when a required setting is missing. Treat a present but empty value as invalid when the application needs a usable address.
+
+### Implement the change
+
+Write a configuration loader and test missing, blank and valid database settings. Keep connection strings out of logs.
+
+### Verify the boundary
+
+Use t.Setenv for valid and blank cases; inject a lookup function for the missing-key case.
+
+### Example
+
+```
+dsn, ok := os.LookupEnv("DATABASE_URL")
+if !ok || strings.TrimSpace(dsn)=="" { return errors.New("DATABASE_URL required") }
+```
+
+### Exercise
+
+Write a configuration loader and test missing, blank and valid database settings. Keep connection strings out of logs.
+
+Hint: Use t.Setenv for valid and blank cases; inject a lookup function for the missing-key case.
+
+Review criteria:
+
+- [ ] Demonstrate the expected success case
+- [ ] Use t.Setenv for valid and blank cases; inject a lookup function for the missing-key case.
+- [ ] Commit the implementation and its verification evidence
+
+### Worked solution
+
+```
+Use t.Setenv for valid and blank cases; inject a lookup function for the missing-key case.
+```
+
+### Checkpoint
+
+What should an error log contain?
+
+1. The full DSN
+2. The missing setting name
+3. The password
+
+Answer: 2. Go services should fail early when a required setting is missing. Treat a present but empty value as invalid when the application needs a usable address.
+
+Sources:
+
+- [os reference](https://pkg.go.dev/os)
+
+## Separate readiness from liveness
+
+40 minutes of guided study, plus practice.
+
+Learning objectives:
+
+- Implement separate live and ready routes. Simulate a database outage and verify only readiness returns 503.
+
+### The problem
+
+A running process can be healthy while its database is unreachable. A readiness probe can temporarily remove it from traffic without restarting it.
+
+### Implement the change
+
+Implement separate live and ready routes. Simulate a database outage and verify only readiness returns 503.
+
+### Verify the boundary
+
+Inject a ping function and test success, error and deadline cases without a live database.
+
+### Example
+
+```
+ctx, cancel := context.WithTimeout(r.Context(), time.Second)
+defer cancel()
+err := db.PingContext(ctx)
+```
+
+### Exercise
+
+Implement separate live and ready routes. Simulate a database outage and verify only readiness returns 503.
+
+Hint: Inject a ping function and test success, error and deadline cases without a live database.
+
+Review criteria:
+
+- [ ] Demonstrate the expected success case
+- [ ] Inject a ping function and test success, error and deadline cases without a live database.
+- [ ] Commit the implementation and its verification evidence
+
+### Worked solution
+
+```
+Inject a ping function and test success, error and deadline cases without a live database.
+```
+
+### Checkpoint
+
+Which check should fail during a temporary database outage?
+
+1. Both checks always
+2. Readiness
+3. Liveness only
+
+Answer: 2. A running process can be healthy while its database is unreachable. A readiness probe can temporarily remove it from traffic without restarting it.
+
+Sources:
+
+- [context reference](https://pkg.go.dev/context)
+
+## Drain in-flight requests
+
+40 minutes of guided study, plus practice.
+
+Learning objectives:
+
+- Start a handler that waits on a channel. Initiate shutdown, release the handler, and verify its response completes.
+
+### The problem
+
+A release can interrupt valid writes. Stop accepting new requests, then allow active handlers a bounded interval to finish.
+
+### Implement the change
+
+Start a handler that waits on a channel. Initiate shutdown, release the handler, and verify its response completes.
+
+### Verify the boundary
+
+Use a channel to establish that the handler started before invoking Shutdown.
+
+### Example
+
+```
+ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+defer cancel()
+err := srv.Shutdown(ctx)
+```
+
+### Exercise
+
+Start a handler that waits on a channel. Initiate shutdown, release the handler, and verify its response completes.
+
+Hint: Use a channel to establish that the handler started before invoking Shutdown.
+
+Review criteria:
+
+- [ ] Demonstrate the expected success case
+- [ ] Use a channel to establish that the handler started before invoking Shutdown.
+- [ ] Commit the implementation and its verification evidence
+
+### Worked solution
+
+```
+Use a channel to establish that the handler started before invoking Shutdown.
+```
+
+### Checkpoint
+
+What should the shutdown deadline bound?
+
+1. Every database query forever
+2. Time allowed for active requests to finish
+3. Browser cache lifetime
+
+Answer: 2. A release can interrupt valid writes. Stop accepting new requests, then allow active handlers a bounded interval to finish.
+
+Sources:
+
+- [net/http reference](https://pkg.go.dev/net/http)
+
+## Prove a backup can be restored
+
+40 minutes of guided study, plus practice.
+
+Learning objectives:
+
+- Use a disposable fixture database and fresh restore target. Confirm one owner can retrieve their task and cannot retrieve another user’s task.
+
+### The problem
+
+A backup file only helps if the team can recover its contents. Restore into an isolated database and check ownership as well as task counts.
+
+### Implement the change
+
+Use a disposable fixture database and fresh restore target. Confirm one owner can retrieve their task and cannot retrieve another user’s task.
+
+### Verify the boundary
+
+Compare fixture IDs, titles, owners and counts. Record the exact commands and recovery time.
+
+### Example
+
+```
+pg_dump --format=custom --file=tasks.dump taskboard
+pg_restore --exit-on-error --no-owner --dbname=taskboard_drill tasks.dump
+```
+
+### Exercise
+
+Use a disposable fixture database and fresh restore target. Confirm one owner can retrieve their task and cannot retrieve another user’s task.
+
+Hint: Compare fixture IDs, titles, owners and counts. Record the exact commands and recovery time.
+
+Review criteria:
+
+- [ ] Demonstrate the expected success case
+- [ ] Compare fixture IDs, titles, owners and counts. Record the exact commands and recovery time.
+- [ ] Commit the implementation and its verification evidence
+
+### Worked solution
+
+```
+Compare fixture IDs, titles, owners and counts. Record the exact commands and recovery time.
+```
+
+### Checkpoint
+
+What proves a backup is usable?
+
+1. A nonempty filename
+2. A tested restore and data checks
+3. A successful upload alone
+
+Answer: 2. A backup file only helps if the team can recover its contents. Restore into an isolated database and check ownership as well as task counts.
+
+Sources:
+
+- [database/sql reference](https://pkg.go.dev/database/sql)
+
+## Assemble release evidence
+
+40 minutes of guided study, plus practice.
+
+Learning objectives:
+
+- Prepare a release note that a classmate can follow on a clean checkout. Include one expected failure and a rollback procedure.
+
+### The problem
+
+A reviewer needs a reproducible trail from a Git revision to a tested application. Record the revision, configuration names, test results and smoke-test procedure together.
+
+### Implement the change
+
+Prepare a release note that a classmate can follow on a clean checkout. Include one expected failure and a rollback procedure.
+
+### Verify the boundary
+
+Have the reviewer reproduce the tests against the pinned commit and record a dated result.
+
+### Example
+
+```
+git rev-parse HEAD
+go test ./...
+go vet ./...
+go build -trimpath -o taskboard .
+```
+
+### Exercise
+
+Prepare a release note that a classmate can follow on a clean checkout. Include one expected failure and a rollback procedure.
+
+Hint: Have the reviewer reproduce the tests against the pinned commit and record a dated result.
+
+Review criteria:
+
+- [ ] Demonstrate the expected success case
+- [ ] Have the reviewer reproduce the tests against the pinned commit and record a dated result.
+- [ ] Commit the implementation and its verification evidence
+
+### Worked solution
+
+```
+Have the reviewer reproduce the tests against the pinned commit and record a dated result.
+```
+
+### Checkpoint
+
+Which identifier pins exactly the reviewed code?
+
+1. The main branch name
+2. The full commit SHA
+3. A local folder name
+
+Answer: 2. A reviewer needs a reproducible trail from a Git revision to a tested application. Record the revision, configuration names, test results and smoke-test procedure together.
+
+Sources:
+
+- [testing reference](https://pkg.go.dev/testing)
+
+## Project: Rehearse a recoverable release
+
+Release the task board into a disposable environment, interrupt it, and recover its data.
+
+Requirements:
+
+- Write a configuration loader and test missing, blank and valid database settings. Keep connection strings out of logs.
+- Implement separate live and ready routes. Simulate a database outage and verify only readiness returns 503.
+- Start a handler that waits on a channel. Initiate shutdown, release the handler, and verify its response completes.
+- Use a disposable fixture database and fresh restore target. Confirm one owner can retrieve their task and cannot retrieve another user’s task.
+- Prepare a release note that a classmate can follow on a clean checkout. Include one expected failure and a rollback procedure.
+
+Self-review rubric:
+
+- [ ] A fresh checkout starts from documented settings
+- [ ] The readiness, drain and restore drills are reproducible
+- [ ] The release note identifies the verified commit
+
+# 12. From a project to a service
 
 Deployment, observability, and your capstone
 
-Level: Full stack. Prerequisite: Connect the whole experience.
+Level: Full stack. Prerequisite: Release rehearsal.
 
 ## Build, configure, and shut down cleanly
 
@@ -2723,4 +3367,4 @@ Self-review rubric:
 
 ## Coverage and learning records
 
-The core path teaches the language and a practical web stack; specialist standard-library packages remain further reference tracks. See sources.json and devdocs-topics.json for the audit. The app saves progress on your device. Export a backup to move or preserve learning records. Code exercises require local execution or the official Go Playground; project rubrics are self-assessments.
+The core path teaches the language and a practical web stack; specialist standard-library packages remain further reference tracks. See sources.json and devdocs-topics.json for the audit. The app saves progress to your student account and publishes milestone summaries to your GitHub repository. Export a backup to move or preserve learning records. Code exercises require local execution or the official Go Playground; project rubrics are self-assessments.
