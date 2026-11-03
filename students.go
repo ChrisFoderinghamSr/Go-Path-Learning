@@ -45,6 +45,7 @@ type record struct {
 }
 type school struct {
 	mu          sync.Mutex
+	recordLocks [64]sync.Mutex
 	sessions    map[string]session
 	units       []unit
 	dir, origin string
@@ -429,9 +430,10 @@ func (s *school) syncGit(ss session, r *record) error {
 	var study struct {
 		Completed []string
 		Last      *string
+		Projects  map[string]map[string]bool
 	}
 	_ = json.Unmarshal(r.Progress, &study)
-	b, _ := json.MarshalIndent(map[string]any{"learner": ss.Login, "completedLessons": study.Completed, "lastLesson": study.Last, "reviews": milestones, "certified": r.Certificate != ""}, "", "  ")
+	b, _ := json.MarshalIndent(map[string]any{"learner": ss.Login, "completedLessons": study.Completed, "projectChecklists": study.Projects, "lastLesson": study.Last, "reviews": milestones, "certified": r.Certificate != ""}, "", "  ")
 	digest := fmt.Sprintf("%x", sha256.Sum256(b))
 	if digest == r.Published {
 		return nil
@@ -479,8 +481,7 @@ func academy(next http.Handler) http.Handler {
 			s.callback(w, q)
 			return
 		}
-		s.mu.Lock()
-		defer s.mu.Unlock()
+
 		if q.Method == "GET" && strings.HasPrefix(p, "/certificate/") {
 			v := strings.Split(strings.TrimPrefix(p, "/certificate/"), "/")
 			if len(v) == 2 {
@@ -497,7 +498,9 @@ func academy(next http.Handler) http.Handler {
 		c, _ := q.Cookie("__Host-go-session")
 		var ss session
 		if c != nil {
+			s.mu.Lock()
 			ss = s.sessions[c.Value]
+			s.mu.Unlock()
 		}
 		if ss.ID == 0 || time.Now().After(ss.Until) {
 			if p == "/" && q.Method == "GET" {
@@ -515,6 +518,18 @@ func academy(next http.Handler) http.Handler {
 			die(w, 401, "Sign in with GitHub.")
 			return
 		}
+		if q.Method == "POST" {
+			q.Body = http.MaxBytesReader(w, q.Body, 256<<10)
+		}
+		lockID := ss.ID
+		if p == "/student/review" && s.reviewer(ss.ID) {
+			if id, err := strconv.ParseInt(q.FormValue("id"), 10, 64); err == nil && id > 0 {
+				lockID = id
+			}
+		}
+		lock := &s.recordLocks[uint64(lockID)%64]
+		lock.Lock()
+		defer lock.Unlock()
 		r, e := s.load(ss.ID)
 		if e != nil {
 			die(w, 500, "Record unreadable.")
@@ -527,7 +542,9 @@ func academy(next http.Handler) http.Handler {
 			}
 			q.Body = http.MaxBytesReader(w, q.Body, 256<<10)
 			if p == "/student/logout" {
+				s.mu.Lock()
 				delete(s.sessions, c.Value)
+				s.mu.Unlock()
 				cookie(w, "__Host-go-session", "", -1)
 				http.Redirect(w, q, "/", 303)
 				return
