@@ -1,0 +1,4 @@
+.example-check/
+.example-results.json
+*.exe
+.DS_Store

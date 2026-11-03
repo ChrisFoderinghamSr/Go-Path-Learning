@@ -1,0 +1,329 @@
+{
+  "retrieved": "2026-11-03",
+  "source": "https://documents.devdocs.io/go/index.json",
+  "entryCount": 6590,
+  "topicCount": 64,
+  "note": "Index inventory, not a claim that each entry has been individually reviewed. DevDocs can differ from the installed Go release. Experimental or internal package topics are not application-level recommendations.",
+  "topics": [
+    {
+      "name": "archive",
+      "entryCount": 57,
+      "reference": "https://devdocs.io/go/#archive"
+    },
+    {
+      "name": "arena",
+      "entryCount": 1,
+      "reference": "https://devdocs.io/go/#arena"
+    },
+    {
+      "name": "bufio",
+      "entryCount": 50,
+      "reference": "https://devdocs.io/go/#bufio"
+    },
+    {
+      "name": "builtin",
+      "entryCount": 49,
+      "reference": "https://devdocs.io/go/#builtin"
+    },
+    {
+      "name": "bytes",
+      "entryCount": 101,
+      "reference": "https://devdocs.io/go/#bytes"
+    },
+    {
+      "name": "cmp",
+      "entryCount": 5,
+      "reference": "https://devdocs.io/go/#cmp"
+    },
+    {
+      "name": "compress",
+      "entryCount": 68,
+      "reference": "https://devdocs.io/go/#compress"
+    },
+    {
+      "name": "container",
+      "entryCount": 38,
+      "reference": "https://devdocs.io/go/#container"
+    },
+    {
+      "name": "context",
+      "entryCount": 17,
+      "reference": "https://devdocs.io/go/#context"
+    },
+    {
+      "name": "crypto",
+      "entryCount": 548,
+      "reference": "https://devdocs.io/go/#crypto"
+    },
+    {
+      "name": "database",
+      "entryCount": 163,
+      "reference": "https://devdocs.io/go/#database"
+    },
+    {
+      "name": "debug",
+      "entryCount": 388,
+      "reference": "https://devdocs.io/go/#debug"
+    },
+    {
+      "name": "embed",
+      "entryCount": 5,
+      "reference": "https://devdocs.io/go/#embed"
+    },
+    {
+      "name": "encoding",
+      "entryCount": 416,
+      "reference": "https://devdocs.io/go/#encoding"
+    },
+    {
+      "name": "errors",
+      "entryCount": 8,
+      "reference": "https://devdocs.io/go/#errors"
+    },
+    {
+      "name": "expvar",
+      "entryCount": 37,
+      "reference": "https://devdocs.io/go/#expvar"
+    },
+    {
+      "name": "flag",
+      "entryCount": 76,
+      "reference": "https://devdocs.io/go/#flag"
+    },
+    {
+      "name": "fmt",
+      "entryCount": 30,
+      "reference": "https://devdocs.io/go/#fmt"
+    },
+    {
+      "name": "go",
+      "entryCount": 798,
+      "reference": "https://devdocs.io/go/#go"
+    },
+    {
+      "name": "hash",
+      "entryCount": 57,
+      "reference": "https://devdocs.io/go/#hash"
+    },
+    {
+      "name": "html",
+      "entryCount": 45,
+      "reference": "https://devdocs.io/go/#html"
+    },
+    {
+      "name": "image",
+      "entryCount": 276,
+      "reference": "https://devdocs.io/go/#image"
+    },
+    {
+      "name": "index",
+      "entryCount": 8,
+      "reference": "https://devdocs.io/go/#index"
+    },
+    {
+      "name": "internal",
+      "entryCount": 27,
+      "reference": "https://devdocs.io/go/#internal"
+    },
+    {
+      "name": "io",
+      "entryCount": 105,
+      "reference": "https://devdocs.io/go/#io"
+    },
+    {
+      "name": "iter",
+      "entryCount": 5,
+      "reference": "https://devdocs.io/go/#iter"
+    },
+    {
+      "name": "log",
+      "entryCount": 172,
+      "reference": "https://devdocs.io/go/#log"
+    },
+    {
+      "name": "maps",
+      "entryCount": 11,
+      "reference": "https://devdocs.io/go/#maps"
+    },
+    {
+      "name": "math",
+      "entryCount": 69,
+      "reference": "https://devdocs.io/go/#math"
+    },
+    {
+      "name": "math/big",
+      "entryCount": 156,
+      "reference": "https://devdocs.io/go/#math%2Fbig"
+    },
+    {
+      "name": "math/bits",
+      "entryCount": 51,
+      "reference": "https://devdocs.io/go/#math%2Fbits"
+    },
+    {
+      "name": "math/cmplx",
+      "entryCount": 28,
+      "reference": "https://devdocs.io/go/#math%2Fcmplx"
+    },
+    {
+      "name": "math/rand",
+      "entryCount": 101,
+      "reference": "https://devdocs.io/go/#math%2Frand"
+    },
+    {
+      "name": "mime",
+      "entryCount": 49,
+      "reference": "https://devdocs.io/go/#mime"
+    },
+    {
+      "name": "net",
+      "entryCount": 266,
+      "reference": "https://devdocs.io/go/#net"
+    },
+    {
+      "name": "net/http",
+      "entryCount": 261,
+      "reference": "https://devdocs.io/go/#net%2Fhttp"
+    },
+    {
+      "name": "net/mail",
+      "entryCount": 16,
+      "reference": "https://devdocs.io/go/#net%2Fmail"
+    },
+    {
+      "name": "net/netip",
+      "entryCount": 81,
+      "reference": "https://devdocs.io/go/#net%2Fnetip"
+    },
+    {
+      "name": "net/rpc",
+      "entryCount": 42,
+      "reference": "https://devdocs.io/go/#net%2Frpc"
+    },
+    {
+      "name": "net/smtp",
+      "entryCount": 22,
+      "reference": "https://devdocs.io/go/#net%2Fsmtp"
+    },
+    {
+      "name": "net/textproto",
+      "entryCount": 41,
+      "reference": "https://devdocs.io/go/#net%2Ftextproto"
+    },
+    {
+      "name": "net/url",
+      "entryCount": 49,
+      "reference": "https://devdocs.io/go/#net%2Furl"
+    },
+    {
+      "name": "os",
+      "entryCount": 189,
+      "reference": "https://devdocs.io/go/#os"
+    },
+    {
+      "name": "path",
+      "entryCount": 35,
+      "reference": "https://devdocs.io/go/#path"
+    },
+    {
+      "name": "plugin",
+      "entryCount": 5,
+      "reference": "https://devdocs.io/go/#plugin"
+    },
+    {
+      "name": "reflect",
+      "entryCount": 134,
+      "reference": "https://devdocs.io/go/#reflect"
+    },
+    {
+      "name": "regexp",
+      "entryCount": 80,
+      "reference": "https://devdocs.io/go/#regexp"
+    },
+    {
+      "name": "runtime",
+      "entryCount": 153,
+      "reference": "https://devdocs.io/go/#runtime"
+    },
+    {
+      "name": "simd",
+      "entryCount": 2,
+      "reference": "https://devdocs.io/go/#simd"
+    },
+    {
+      "name": "slices",
+      "entryCount": 41,
+      "reference": "https://devdocs.io/go/#slices"
+    },
+    {
+      "name": "sort",
+      "entryCount": 38,
+      "reference": "https://devdocs.io/go/#sort"
+    },
+    {
+      "name": "strconv",
+      "entryCount": 40,
+      "reference": "https://devdocs.io/go/#strconv"
+    },
+    {
+      "name": "strings",
+      "entryCount": 84,
+      "reference": "https://devdocs.io/go/#strings"
+    },
+    {
+      "name": "structs",
+      "entryCount": 2,
+      "reference": "https://devdocs.io/go/#structs"
+    },
+    {
+      "name": "sync",
+      "entryCount": 138,
+      "reference": "https://devdocs.io/go/#sync"
+    },
+    {
+      "name": "syscall",
+      "entryCount": 366,
+      "reference": "https://devdocs.io/go/#syscall"
+    },
+    {
+      "name": "testing",
+      "entryCount": 164,
+      "reference": "https://devdocs.io/go/#testing"
+    },
+    {
+      "name": "text",
+      "entryCount": 140,
+      "reference": "https://devdocs.io/go/#text"
+    },
+    {
+      "name": "time",
+      "entryCount": 95,
+      "reference": "https://devdocs.io/go/#time"
+    },
+    {
+      "name": "unicode",
+      "entryCount": 57,
+      "reference": "https://devdocs.io/go/#unicode"
+    },
+    {
+      "name": "unique",
+      "entryCount": 4,
+      "reference": "https://devdocs.io/go/#unique"
+    },
+    {
+      "name": "unsafe",
+      "entryCount": 12,
+      "reference": "https://devdocs.io/go/#unsafe"
+    },
+    {
+      "name": "uuid",
+      "entryCount": 14,
+      "reference": "https://devdocs.io/go/#uuid"
+    },
+    {
+      "name": "weak",
+      "entryCount": 4,
+      "reference": "https://devdocs.io/go/#weak"
+    }
+  ]
+}

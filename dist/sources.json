@@ -1,0 +1,629 @@
+{
+  "title": "Go Path documentation and curriculum audit",
+  "reviewedAt": "2026-11-03",
+  "scope": "The DevDocs Go topic index was inventoried, then core language, standard-library application topics and official Go documentation were used to design an original beginner-to-full-stack learning sequence. This is not a claim that every linked package, symbol or external link was individually read.",
+  "devdocs": {
+    "url": "https://devdocs.io/go/",
+    "index": "https://documents.devdocs.io/go/index.json",
+    "entryCount": 6590,
+    "topicCount": 64,
+    "inventory": "devdocs-topics.json",
+    "note": "The index inventory is searchable in the Reference Explorer. Experimental, internal and version-specific entries are references, not recommendations to use them in application code."
+  },
+  "curriculum": {
+    "modules": 10,
+    "lessons": 30,
+    "learningStack": "Go standard library + PostgreSQL + same-origin semantic HTML/CSS/JavaScript. A maintained PostgreSQL driver is an explicit external dependency.",
+    "appStack": "HTML, CSS and JavaScript; progress stored locally with export/import. No remote Go execution or automated code grader is claimed.",
+    "minimumFeatures": "Generic examples need Go 1.18+; method-aware ServeMux examples need Go 1.22+. Install a currently supported stable Go release and consult version notes."
+  },
+  "crossChecks": [
+    {
+      "topic": "Setup and modules",
+      "url": "https://go.dev/doc/tutorial/create-module",
+      "finding": "Packages and modules are distinct; dependencies and package boundaries are introduced progressively."
+    },
+    {
+      "topic": "Language semantics",
+      "url": "https://go.dev/ref/spec",
+      "finding": "Zero values, slice/map behavior, switch semantics, receivers, interfaces and constraints underpin the early lessons."
+    },
+    {
+      "topic": "Idiomatic style",
+      "url": "https://go.dev/doc/effective_go",
+      "finding": "Used for naming, control flow and interfaces; not treated as a complete modern guide to modules or generics."
+    },
+    {
+      "topic": "HTTP boundaries",
+      "url": "https://pkg.go.dev/net/http",
+      "finding": "Headers precede writes; MaxBytesReader bounds incoming bodies; server timeouts and shutdown are explicit."
+    },
+    {
+      "topic": "Database transactions",
+      "url": "https://go.dev/doc/database/execute-transactions",
+      "finding": "Every statement in an atomic unit uses sql.Tx; operations through sql.DB would run outside the transaction."
+    },
+    {
+      "topic": "Concurrency",
+      "url": "https://go.dev/ref/mem",
+      "finding": "Shared mutable state requires synchronization; WaitGroup completion is distinct from mutex protection."
+    },
+    {
+      "topic": "Fuzzing",
+      "url": "https://go.dev/doc/tutorial/fuzz",
+      "finding": "Exercises use stable properties and seed inputs; fuzzing complements example-based tests."
+    },
+    {
+      "topic": "Security maintenance",
+      "url": "https://go.dev/doc/security/best-practices",
+      "finding": "Vulnerability scanning, updates, race checks and fuzzing provide complementary evidence."
+    },
+    {
+      "topic": "PostgreSQL schema",
+      "url": "https://www.postgresql.org/docs/current/ddl-constraints.html",
+      "finding": "Constraints protect database invariants; migrations and parameter placeholders are explicitly PostgreSQL-specific."
+    },
+    {
+      "topic": "Browser integration",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch",
+      "finding": "fetch does not reject for all HTTP error statuses; clients check response.ok and render untrusted titles as text."
+    }
+  ],
+  "topicMap": [
+    {
+      "module": "foundations",
+      "title": "Your first Go program",
+      "lessons": [
+        {
+          "id": "hello",
+          "title": "Set up and say hello",
+          "sources": [
+            {
+              "title": "Install Go",
+              "url": "https://go.dev/doc/install"
+            },
+            {
+              "title": "Getting started",
+              "url": "https://go.dev/doc/tutorial/getting-started"
+            }
+          ]
+        },
+        {
+          "id": "values",
+          "title": "Values, variables, and zero values",
+          "sources": [
+            {
+              "title": "Go language specification",
+              "url": "https://go.dev/ref/spec"
+            },
+            {
+              "title": "fmt package",
+              "url": "https://pkg.go.dev/fmt"
+            }
+          ]
+        },
+        {
+          "id": "control",
+          "title": "Decisions, loops, and readable flow",
+          "sources": [
+            {
+              "title": "Go language specification",
+              "url": "https://go.dev/ref/spec"
+            },
+            {
+              "title": "Effective Go",
+              "url": "https://go.dev/doc/effective_go"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "module": "data",
+      "title": "Work with real data",
+      "lessons": [
+        {
+          "id": "functions",
+          "title": "Functions with useful contracts",
+          "sources": [
+            {
+              "title": "Go language specification",
+              "url": "https://go.dev/ref/spec"
+            },
+            {
+              "title": "Create a module",
+              "url": "https://go.dev/doc/tutorial/create-module"
+            }
+          ]
+        },
+        {
+          "id": "collections",
+          "title": "Slices and maps without surprises",
+          "sources": [
+            {
+              "title": "Go language specification",
+              "url": "https://go.dev/ref/spec"
+            },
+            {
+              "title": "Go slices: usage and internals",
+              "url": "https://go.dev/blog/slices-intro"
+            }
+          ]
+        },
+        {
+          "id": "text",
+          "title": "Text, parsing, and useful validation",
+          "sources": [
+            {
+              "title": "strconv package",
+              "url": "https://pkg.go.dev/strconv"
+            },
+            {
+              "title": "strings package",
+              "url": "https://pkg.go.dev/strings"
+            },
+            {
+              "title": "Strings, bytes, runes and characters",
+              "url": "https://go.dev/blog/strings"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "module": "types",
+      "title": "Design with types",
+      "lessons": [
+        {
+          "id": "structs",
+          "title": "Structs, methods, and pointers",
+          "sources": [
+            {
+              "title": "Go language specification",
+              "url": "https://go.dev/ref/spec"
+            },
+            {
+              "title": "Effective Go",
+              "url": "https://go.dev/doc/effective_go"
+            }
+          ]
+        },
+        {
+          "id": "errors",
+          "title": "Errors and small interfaces",
+          "sources": [
+            {
+              "title": "errors package",
+              "url": "https://pkg.go.dev/errors"
+            },
+            {
+              "title": "Working with Errors in Go",
+              "url": "https://go.dev/blog/go1.13-errors"
+            }
+          ]
+        },
+        {
+          "id": "generics",
+          "title": "Generics when the algorithm stays the same",
+          "sources": [
+            {
+              "title": "Generics tutorial",
+              "url": "https://go.dev/doc/tutorial/generics"
+            },
+            {
+              "title": "Go language specification",
+              "url": "https://go.dev/ref/spec"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "module": "packages",
+      "title": "Build useful Go programs",
+      "lessons": [
+        {
+          "id": "modules",
+          "title": "Packages and dependency hygiene",
+          "sources": [
+            {
+              "title": "Managing dependencies",
+              "url": "https://go.dev/doc/modules/managing-dependencies"
+            },
+            {
+              "title": "Organizing a module",
+              "url": "https://go.dev/doc/modules/layout"
+            }
+          ]
+        },
+        {
+          "id": "streams",
+          "title": "Files, readers, and resource ownership",
+          "sources": [
+            {
+              "title": "io package",
+              "url": "https://pkg.go.dev/io"
+            },
+            {
+              "title": "bufio package",
+              "url": "https://pkg.go.dev/bufio"
+            },
+            {
+              "title": "os package",
+              "url": "https://pkg.go.dev/os"
+            }
+          ]
+        },
+        {
+          "id": "json",
+          "title": "JSON as an explicit data contract",
+          "sources": [
+            {
+              "title": "encoding/json package",
+              "url": "https://pkg.go.dev/encoding/json"
+            },
+            {
+              "title": "JSON and Go",
+              "url": "https://go.dev/blog/json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "module": "testing",
+      "title": "Make correctness visible",
+      "lessons": [
+        {
+          "id": "unit-tests",
+          "title": "Table-driven tests that catch mistakes",
+          "sources": [
+            {
+              "title": "testing package",
+              "url": "https://pkg.go.dev/testing"
+            },
+            {
+              "title": "Coverage for Go applications",
+              "url": "https://go.dev/doc/build-cover"
+            }
+          ]
+        },
+        {
+          "id": "http-tests",
+          "title": "Test behavior at an HTTP boundary",
+          "sources": [
+            {
+              "title": "net/http/httptest package",
+              "url": "https://pkg.go.dev/net/http/httptest"
+            },
+            {
+              "title": "encoding/json package",
+              "url": "https://pkg.go.dev/encoding/json"
+            }
+          ]
+        },
+        {
+          "id": "fuzzing",
+          "title": "Fuzz invariants and measure before optimizing",
+          "sources": [
+            {
+              "title": "Fuzzing tutorial",
+              "url": "https://go.dev/doc/tutorial/fuzz"
+            },
+            {
+              "title": "Race detector",
+              "url": "https://go.dev/doc/articles/race_detector"
+            },
+            {
+              "title": "testing package",
+              "url": "https://pkg.go.dev/testing"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "module": "concurrency",
+      "title": "Concurrency with a clear lifetime",
+      "lessons": [
+        {
+          "id": "goroutines",
+          "title": "Goroutines and channels",
+          "sources": [
+            {
+              "title": "Go concurrency patterns: pipelines",
+              "url": "https://go.dev/blog/pipelines"
+            },
+            {
+              "title": "Go language specification",
+              "url": "https://go.dev/ref/spec"
+            }
+          ]
+        },
+        {
+          "id": "sync",
+          "title": "Shared state and bounded workers",
+          "sources": [
+            {
+              "title": "sync package",
+              "url": "https://pkg.go.dev/sync"
+            },
+            {
+              "title": "Memory model",
+              "url": "https://go.dev/ref/mem"
+            },
+            {
+              "title": "Race detector",
+              "url": "https://go.dev/doc/articles/race_detector"
+            }
+          ]
+        },
+        {
+          "id": "context",
+          "title": "Cancellation and deadlines",
+          "sources": [
+            {
+              "title": "context package",
+              "url": "https://pkg.go.dev/context"
+            },
+            {
+              "title": "Go concurrency patterns: context",
+              "url": "https://go.dev/blog/context"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "module": "http",
+      "title": "Build a Go web API",
+      "lessons": [
+        {
+          "id": "routing",
+          "title": "HTTP handlers and routes",
+          "sources": [
+            {
+              "title": "net/http package",
+              "url": "https://pkg.go.dev/net/http"
+            },
+            {
+              "title": "Go 1.22 routing changes",
+              "url": "https://go.dev/blog/routing-enhancements"
+            }
+          ]
+        },
+        {
+          "id": "requests",
+          "title": "Validate JSON at the edge",
+          "sources": [
+            {
+              "title": "net/http package",
+              "url": "https://pkg.go.dev/net/http"
+            },
+            {
+              "title": "encoding/json package",
+              "url": "https://pkg.go.dev/encoding/json"
+            },
+            {
+              "title": "io package",
+              "url": "https://pkg.go.dev/io"
+            }
+          ]
+        },
+        {
+          "id": "middleware",
+          "title": "Middleware and a stable API contract",
+          "sources": [
+            {
+              "title": "net/http package",
+              "url": "https://pkg.go.dev/net/http"
+            },
+            {
+              "title": "Writing web applications",
+              "url": "https://go.dev/doc/articles/wiki/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "module": "database",
+      "title": "Add durable storage",
+      "lessons": [
+        {
+          "id": "schema",
+          "title": "Model data and connect safely",
+          "sources": [
+            {
+              "title": "Opening a database handle",
+              "url": "https://go.dev/doc/database/open-handle"
+            },
+            {
+              "title": "PostgreSQL constraints",
+              "url": "https://www.postgresql.org/docs/current/ddl-constraints.html"
+            }
+          ]
+        },
+        {
+          "id": "queries",
+          "title": "Queries, ownership, and SQL injection",
+          "sources": [
+            {
+              "title": "Avoiding SQL injection",
+              "url": "https://go.dev/doc/database/sql-injection"
+            },
+            {
+              "title": "Querying for data",
+              "url": "https://go.dev/doc/database/querying"
+            },
+            {
+              "title": "database/sql package",
+              "url": "https://pkg.go.dev/database/sql"
+            }
+          ]
+        },
+        {
+          "id": "transactions",
+          "title": "Transactions and consistent updates",
+          "sources": [
+            {
+              "title": "Executing transactions",
+              "url": "https://go.dev/doc/database/execute-transactions"
+            },
+            {
+              "title": "PostgreSQL transaction isolation",
+              "url": "https://www.postgresql.org/docs/current/transaction-iso.html"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "module": "fullstack",
+      "title": "Connect the whole experience",
+      "lessons": [
+        {
+          "id": "frontend",
+          "title": "A frontend that understands the API",
+          "sources": [
+            {
+              "title": "MDN: Using Fetch",
+              "url": "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch"
+            },
+            {
+              "title": "MDN: textContent",
+              "url": "https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent"
+            }
+          ]
+        },
+        {
+          "id": "sessions",
+          "title": "Identity, sessions, and authorization",
+          "sources": [
+            {
+              "title": "crypto/rand package",
+              "url": "https://pkg.go.dev/crypto/rand"
+            },
+            {
+              "title": "net/http package",
+              "url": "https://pkg.go.dev/net/http"
+            },
+            {
+              "title": "Go security best practices",
+              "url": "https://go.dev/doc/security/best-practices"
+            },
+            {
+              "title": "MDN: Set-Cookie",
+              "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie"
+            }
+          ]
+        },
+        {
+          "id": "security",
+          "title": "Security as everyday engineering",
+          "sources": [
+            {
+              "title": "Security best practices",
+              "url": "https://go.dev/doc/security/best-practices"
+            },
+            {
+              "title": "html/template package",
+              "url": "https://pkg.go.dev/html/template"
+            },
+            {
+              "title": "govulncheck",
+              "url": "https://go.dev/doc/security/vuln/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "module": "production",
+      "title": "From a project to a service",
+      "lessons": [
+        {
+          "id": "deployment",
+          "title": "Build, configure, and shut down cleanly",
+          "sources": [
+            {
+              "title": "net/http package",
+              "url": "https://pkg.go.dev/net/http"
+            },
+            {
+              "title": "os/signal package",
+              "url": "https://pkg.go.dev/os/signal"
+            },
+            {
+              "title": "Go command",
+              "url": "https://pkg.go.dev/cmd/go"
+            }
+          ]
+        },
+        {
+          "id": "operations",
+          "title": "Observe, diagnose, and improve",
+          "sources": [
+            {
+              "title": "Diagnostics",
+              "url": "https://go.dev/doc/diagnostics"
+            },
+            {
+              "title": "Garbage collector guide",
+              "url": "https://go.dev/doc/gc-guide"
+            },
+            {
+              "title": "log/slog package",
+              "url": "https://pkg.go.dev/log/slog"
+            }
+          ]
+        },
+        {
+          "id": "capstone",
+          "title": "Capstone: a trustworthy full-stack task board",
+          "sources": [
+            {
+              "title": "Go documentation hub",
+              "url": "https://go.dev/doc/"
+            },
+            {
+              "title": "Database documentation",
+              "url": "https://go.dev/doc/database/"
+            },
+            {
+              "title": "Security best practices",
+              "url": "https://go.dev/doc/security/best-practices"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "extensions": {
+    "covered": [
+      "PostgreSQL schema, migrations and ownership-scoped SQL",
+      "Browser fetch, accessible form states and safe text rendering",
+      "Sessions, authentication versus authorization, CSRF and threat modeling",
+      "Deployment, shutdown, logs, recovery and capstone evidence"
+    ],
+    "note": "These full-stack topics extend beyond the DevDocs Go reference. They are distinguished from language rules and point to official Go, PostgreSQL and MDN references."
+  },
+  "advancedReferenceTracks": [
+    "archive and compress",
+    "crypto primitives and protocol internals",
+    "debug and executable formats",
+    "go/ast, go/parser and compiler tooling",
+    "image and rendering",
+    "math, big numbers and specialized numeric work",
+    "net/rpc, mail and protocol-specific tools",
+    "plugin and platform-specific syscall",
+    "reflection, runtime, unsafe and weak references"
+  ],
+  "limitations": [
+    "No exhaustive symbol-by-symbol reading or validation is claimed.",
+    "DevDocs content and the installed Go release may differ; linked official documentation and API version notes are the authority.",
+    "Contextual code and test-plan solutions require the surrounding application or preceding lesson; they are labeled.",
+    "Self-review checklists and quiz scores are learning aids, not a certification or proof of production readiness.",
+    "Production authentication, CSRF, deployment and recovery require integration choices and testing in the learner’s actual environment."
+  ]
+}
