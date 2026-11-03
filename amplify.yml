@@ -4,7 +4,8 @@ frontend:
     build:
       commands:
         - node check.mjs
+        - node build-amplify.mjs
   artifacts:
-    baseDirectory: dist
+    baseDirectory: amplify-site
     files:
       - '**/*'

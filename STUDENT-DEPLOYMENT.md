@@ -34,3 +34,5 @@ bash deploy/launch.sh
 ```
 
 The script prints the load balancer DNS name after checking /healthz and confirming anonymous requests to /student/state receive 401. Create a Route 53 A alias for www.go pointing to that load balancer, then complete the real student and independent instructor test above. Existing go.chrisfoderingham.com can continue serving the Amplify edition during the transition. To roll back a service revision, check out a previous tested release and rerun the script with the same stack and volume. Retain the encrypted EFS filesystem and verify a backup restore separately.
+
+Amplify builds the public course catalog with node build-amplify.mjs. After the student service passes its HTTPS and OAuth checks, set STUDENT_SERVICE_ORIGIN to its bare HTTPS origin in Amplify and redeploy to show the enrollment link.

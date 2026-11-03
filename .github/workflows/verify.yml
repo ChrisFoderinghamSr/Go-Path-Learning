@@ -20,6 +20,8 @@ jobs:
           node-version: '22'
       - name: Check course routes, backups and certificate catalog
         run: node check.mjs
+      - name: Build the public Amplify catalog
+        run: node build-amplify.mjs
       - name: Validate the AWS launch configuration
         run: |
           bash -n deploy/launch.sh

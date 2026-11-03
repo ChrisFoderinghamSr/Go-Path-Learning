@@ -3,3 +3,4 @@
 *.exe
 .DS_Store
 .student-data/
+/amplify-site/
