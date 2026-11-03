@@ -14,7 +14,7 @@
     "modules": 12,
     "lessons": 40,
     "learningStack": "Go standard library + PostgreSQL + same-origin semantic HTML/CSS/JavaScript. A maintained PostgreSQL driver is an explicit external dependency.",
-    "appStack": "HTML, CSS and JavaScript; progress stored locally with export/import. No remote Go execution or automated code grader is claimed.",
+    "appStack": "HTML, CSS and JavaScript; GitHub sign-in, private backend records and public milestone summaries with export/import. No remote Go execution or automated code grader is claimed.",
     "minimumFeatures": "Generic examples need Go 1.18+; method-aware ServeMux examples need Go 1.22+. Install a currently supported stable Go release and consult version notes.",
     "projects": 12
   },

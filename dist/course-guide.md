@@ -3367,4 +3367,4 @@ Self-review rubric:
 
 ## Coverage and learning records
 
-The core path teaches the language and a practical web stack; specialist standard-library packages remain further reference tracks. See sources.json and devdocs-topics.json for the audit. The app saves progress on your device. Export a backup to move or preserve learning records. Code exercises require local execution or the official Go Playground; project rubrics are self-assessments.
+The core path teaches the language and a practical web stack; specialist standard-library packages remain further reference tracks. See sources.json and devdocs-topics.json for the audit. The app saves progress to your student account and publishes milestone summaries to your GitHub repository. Export a backup to move or preserve learning records. Code exercises require local execution or the official Go Playground; project rubrics are self-assessments.

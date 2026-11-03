@@ -8,7 +8,7 @@ Passed with Go 1.26.5 on Windows and Node.js 26.5.1:
 - `go vet ./...`.
 - 23 complete Go example/solution checks with `go test`. The multi-file module example was assembled into its documented files; the clamp test used the function from the earlier exercise solution. Contextual SQL, frontend, shell and integration snippets require the surrounding application described in their lessons and were not all executed as complete applications.
 
-Browser verification on the local preview:
+Earlier browser checks on the local, browser-storage edition (before GitHub enrollment):
 
 - Dashboard layout and lesson navigation.
 - Exercise review, correct quiz feedback, lesson completion and the updated dashboard.

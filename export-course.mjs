@@ -12,6 +12,6 @@ for(const [i,m] of modules.entries()){
  }
  text+=`## Project: ${m.project.title}\n\n${m.project.brief}\n\nRequirements:\n\n${m.project.requirements.map(r=>'- '+r).join('\n')}\n\nSelf-review rubric:\n\n${m.project.rubric.map(r=>'- [ ] '+r).join('\n')}\n\n`;
 }
-text+='## Coverage and learning records\n\nThe core path teaches the language and a practical web stack; specialist standard-library packages remain further reference tracks. See sources.json and devdocs-topics.json for the audit. The app saves progress on your device. Export a backup to move or preserve learning records. Code exercises require local execution or the official Go Playground; project rubrics are self-assessments.\n';
+text+='## Coverage and learning records\n\nThe core path teaches the language and a practical web stack; specialist standard-library packages remain further reference tracks. See sources.json and devdocs-topics.json for the audit. The app saves progress to your student account and publishes milestone summaries to your GitHub repository. Export a backup to move or preserve learning records. Code exercises require local execution or the official Go Playground; project rubrics are self-assessments.\n';
 fs.writeFileSync('CURRICULUM.md',text);fs.writeFileSync('dist/course-guide.md',text);
 console.log(`Exported ${modules.length} modules and ${modules.flatMap(m=>m.lessons).length} lessons.`);
