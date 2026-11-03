@@ -1,10 +1,10 @@
 'use strict';
 const modules=window.CURRICULUM||[], lessons=modules.flatMap((m,mi)=>m.lessons.map((l,li)=>({...l,module:m,mi,li}))), byId=new Map(lessons.map(l=>[l.id,l]));
-const STORE='gopath.v1';
+const STORE='gopath.v1.'+(window.studentAccount?.id||'local');
 const blank=()=>({version:1,completed:[],quiz:{},notes:{},drafts:{},checks:{},projects:{},last:null});
 function validate(s){if(!s||s.version!==1||!Array.isArray(s.completed)||s.completed.some(id=>!byId.has(id)))throw Error('Invalid progress file');if(new Set(s.completed).size!==s.completed.length)throw Error('Duplicate completion');if(s.last!==null&&!byId.has(s.last))throw Error('Invalid last lesson');for(const key of ['quiz','notes','drafts','checks','projects'])if(!s[key]||typeof s[key]!=='object'||Array.isArray(s[key]))throw Error('Missing '+key);for(const key of ['notes','drafts'])for(const [id,v] of Object.entries(s[key]))if(!byId.has(id)||typeof v!=='string'||v.length>200000)throw Error('Invalid text');for(const [id,v]of Object.entries(s.quiz))if(!byId.has(id)||!Number.isInteger(v)||v<0||v>=byId.get(id).quiz.options.length)throw Error('Invalid quiz');for(const [key,records]of [['checks',s.checks],['projects',s.projects]])for(const [id,record]of Object.entries(records)){const owner=key==='checks'?byId.get(id):modules.find(m=>m.id===id);if(!owner||!record||typeof record!=='object'||Array.isArray(record))throw Error('Invalid checklist');const size=key==='checks'?owner.checks.length:owner.project.rubric.length;for(const [i,value]of Object.entries(record))if(!/^\d+$/.test(i)||Number(i)>=size||typeof value!=='boolean')throw Error('Invalid checklist value')}return s}
-let state;try{state=validate(JSON.parse(localStorage.getItem(STORE)))}catch{state=blank()}
-let storageWarning=false;function save(){try{localStorage.setItem(STORE,JSON.stringify(state))}catch{if(!storageWarning){toast('Device storage is unavailable. Export your progress before leaving.');storageWarning=true}}}
+let state;try{state=validate(window.studentAccount ? window.studentAccount.progress : JSON.parse(localStorage.getItem(STORE)))}catch{state=blank()}
+let storageWarning=false;function save(){if(window.studentAccount){window.studentAccount.save(state);return}try{localStorage.setItem(STORE,JSON.stringify(state))}catch{if(!storageWarning){toast('Device storage is unavailable. Export your progress before leaving.');storageWarning=true}}}
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const done=id=>state.completed.includes(id), pct=()=>Math.round(state.completed.length/Math.max(1,lessons.length)*100), modDone=m=>m.lessons.filter(l=>done(l.id)).length;
 function nextLesson(){return byId.get(state.last)&&!done(state.last)?byId.get(state.last):lessons.find(l=>!done(l.id))||lessons[0]}
@@ -39,3 +39,5 @@ document.addEventListener('click',async e=>{const action=e.target.closest('[data
 document.querySelector('#export').onclick=()=>download('go-path-progress.json',JSON.stringify(state,null,2));
 document.querySelector('#import-file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{if(f.size>2000000)throw Error('File too large');const imported=validate(JSON.parse(await f.text()));if(confirm('Replace progress, drafts and notes on this device with this backup?')){state=imported;save();render();toast('Your learning space has been restored.')}}catch{toast('That is not a valid Go Path progress backup.')}e.target.value=''};
 render();
+
+

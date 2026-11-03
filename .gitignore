@@ -2,3 +2,4 @@
 .example-results.json
 *.exe
 .DS_Store
+.student-data/
