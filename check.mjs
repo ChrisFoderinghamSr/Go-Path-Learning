@@ -28,3 +28,11 @@ assert.throws(()=>vm.runInContext('validate({...blank(),notes:{abc:42}})',contex
 vm.runInContext('state=blank();state.notes[lessons[0].id]="<img src=x onerror=alert(1)>";location.hash="#notes";render()',context);
 assert(!element('main').innerHTML.includes('<img'),'imported note text must be escaped');
 console.log(`Passed: ${routes.length} routes, ${ids.size} lesson schemas, backup validation and note escaping.`);
+
+context.window.publicCatalog={origin:'https://students.example.test'};
+for(const route of ['lesson/'+modules[0].lessons[0].id,'assessment/'+modules[0].id,'project/'+modules[0].id,'notes']){
+  context.location.hash='#'+route;
+  vm.runInContext('render()',context);
+  assert(element('main').innerHTML.includes('https://students.example.test/student/login'),route);
+  assert(!/<(?:textarea|input)\b/i.test(element('main').innerHTML),route+' must prompt for enrollment before editing');
+}
