@@ -36,5 +36,8 @@ route=(--connect-to "$host:443:$alb:443" --retry 5 --retry-all-errors)
 curl "${route[@]}" -fsS "https://$host/healthz"
 code=$(curl "${route[@]}" -sS -o /dev/null -w '%{http_code}' "https://$host/student/state")
 [[ $code == 401 ]] || { echo "Expected unauthenticated student state to return 401; got $code."; exit 1; }
+# A healthy catalog can still lack its student OAuth configuration.
+login=$(curl "${route[@]}" -sS -o /dev/null -w '%{http_code} %{redirect_url}' "https://$host/student/login")
+[[ $login == "302 https://github.com/login/oauth/authorize?"* ]] || { echo "Student sign-in did not start GitHub authorization."; exit 1; }
 echo "Verified $sha on $alb. Route 53 alias target for $host: $alb"
 
