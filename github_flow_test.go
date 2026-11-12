@@ -89,3 +89,22 @@ func TestEnrollmentSubmissionReviewAndPublication(t *testing.T) {
 		t.Fatal("missing independently verified credential")
 	}
 }
+
+func TestStudentLoginReadiness(t *testing.T) {
+	t.Setenv("GITHUB_CLIENT_ID", "course-fixture")
+	t.Setenv("GITHUB_CLIENT_SECRET", "")
+	s := school{origin:"https://course.example.test"}
+	login := func() *httptest.ResponseRecorder {
+		w := httptest.NewRecorder()
+		s.signin(w, httptest.NewRequest("GET","/student/login",nil))
+		return w
+	}
+	if got := login().Code; got != http.StatusServiceUnavailable { t.Fatalf("unconfigured login returned %d",got) }
+	t.Setenv("GITHUB_CLIENT_SECRET","local-test-only")
+	w := login()
+	location, err := url.Parse(w.Header().Get("Location"))
+	if err != nil || w.Code != http.StatusFound || location.Host != "github.com" || location.Path != "/login/oauth/authorize" {
+		t.Fatalf("unexpected authorization redirect: status=%d err=%v",w.Code,err)
+	}
+	if got:=location.Query().Get("redirect_uri"); got != s.origin+"/student/callback" { t.Fatalf("unexpected callback %q",got) }
+}
